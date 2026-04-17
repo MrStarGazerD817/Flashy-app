@@ -1,0 +1,1749 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flashy</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Mono:ital,wght@0,300;0,400;1,300&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0f0f11;
+    --surface: #17171a;
+    --surface2: #1e1e23;
+    --surface3: #26262d;
+    --border: #2e2e38;
+    --border2: #3a3a48;
+    --text: #e8e8f0;
+    --text2: #9090a8;
+    --text3: #5a5a72;
+    --accent: #7c6af7;
+    --accent2: #a594f9;
+    --accent-glow: rgba(124,106,247,0.18);
+    --green: #4ade80;
+    --red: #f87171;
+    --yellow: #fbbf24;
+    --card-radius: 14px;
+    --radius: 10px;
+    --sm-radius: 6px;
+  }
+
+- { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+font-family: ‘Syne’, sans-serif;
+background: var(–bg);
+color: var(–text);
+min-height: 100vh;
+overflow-x: hidden;
+}
+
+/* ─── NOISE OVERLAY ─── */
+body::before {
+content: ‘’;
+position: fixed;
+inset: 0;
+background-image: url(“data:image/svg+xml,%3Csvg viewBox=‘0 0 256 256’ xmlns=‘http://www.w3.org/2000/svg’%3E%3Cfilter id=‘noise’%3E%3CfeTurbulence type=‘fractalNoise’ baseFrequency=‘0.9’ numOctaves=‘4’ stitchTiles=‘stitch’/%3E%3C/filter%3E%3Crect width=‘100%25’ height=‘100%25’ filter=‘url(%23noise)’ opacity=‘0.03’/%3E%3C/svg%3E”);
+pointer-events: none;
+z-index: 9999;
+opacity: 0.4;
+}
+
+/* ─── LAYOUT ─── */
+.app { display: flex; height: 100vh; }
+
+/* ─── SIDEBAR ─── */
+.sidebar {
+width: 260px;
+min-width: 260px;
+background: var(–surface);
+border-right: 1px solid var(–border);
+display: flex;
+flex-direction: column;
+overflow: hidden;
+}
+
+.sidebar-header {
+padding: 20px 18px 16px;
+border-bottom: 1px solid var(–border);
+}
+
+.logo {
+font-size: 22px;
+font-weight: 800;
+letter-spacing: -0.5px;
+background: linear-gradient(135deg, #fff 30%, var(–accent2));
+-webkit-background-clip: text;
+-webkit-text-fill-color: transparent;
+background-clip: text;
+display: flex;
+align-items: center;
+gap: 8px;
+}
+
+.logo-icon {
+width: 28px; height: 28px;
+background: linear-gradient(135deg, var(–accent), #c084fc);
+border-radius: 8px;
+display: flex; align-items: center; justify-content: center;
+font-size: 14px;
+-webkit-text-fill-color: white;
+flex-shrink: 0;
+box-shadow: 0 4px 12px rgba(124,106,247,0.4);
+}
+
+.sidebar-section {
+padding: 14px 12px 8px;
+font-size: 10px;
+font-weight: 600;
+letter-spacing: 1.5px;
+color: var(–text3);
+text-transform: uppercase;
+}
+
+.sidebar-btn {
+display: flex;
+align-items: center;
+gap: 10px;
+padding: 9px 14px;
+margin: 1px 8px;
+border-radius: var(–sm-radius);
+cursor: pointer;
+font-family: ‘Syne’, sans-serif;
+font-size: 13.5px;
+font-weight: 500;
+color: var(–text2);
+transition: all 0.15s;
+border: none;
+background: none;
+width: calc(100% - 16px);
+text-align: left;
+}
+
+.sidebar-btn:hover { background: var(–surface2); color: var(–text); }
+.sidebar-btn.active { background: var(–accent-glow); color: var(–accent2); }
+.sidebar-btn .icon { font-size: 15px; width: 18px; text-align: center; }
+
+.deck-list { flex: 1; overflow-y: auto; padding-bottom: 8px; }
+.deck-list::-webkit-scrollbar { width: 4px; }
+.deck-list::-webkit-scrollbar-track { background: transparent; }
+.deck-list::-webkit-scrollbar-thumb { background: var(–border2); border-radius: 4px; }
+
+.deck-item {
+display: flex;
+align-items: center;
+gap: 10px;
+padding: 8px 14px;
+margin: 1px 8px;
+border-radius: var(–sm-radius);
+cursor: pointer;
+font-size: 13px;
+font-weight: 500;
+color: var(–text2);
+transition: all 0.15s;
+position: relative;
+}
+
+.deck-item:hover { background: var(–surface2); color: var(–text); }
+.deck-item.active { background: var(–accent-glow); color: var(–accent2); }
+
+.deck-dot {
+width: 8px; height: 8px; border-radius: 50%;
+flex-shrink: 0;
+}
+
+.deck-count {
+margin-left: auto;
+font-size: 11px;
+font-family: ‘DM Mono’, monospace;
+color: var(–text3);
+background: var(–surface3);
+padding: 1px 6px;
+border-radius: 20px;
+}
+
+.sidebar-footer {
+padding: 12px;
+border-top: 1px solid var(–border);
+display: flex;
+gap: 8px;
+}
+
+.footer-btn {
+flex: 1;
+padding: 8px;
+border-radius: var(–sm-radius);
+border: 1px solid var(–border);
+background: var(–surface2);
+color: var(–text2);
+font-family: ‘Syne’, sans-serif;
+font-size: 12px;
+font-weight: 600;
+cursor: pointer;
+transition: all 0.15s;
+text-align: center;
+}
+
+.footer-btn:hover { border-color: var(–accent); color: var(–accent2); }
+.footer-btn.primary { background: var(–accent); border-color: var(–accent); color: white; }
+.footer-btn.primary:hover { background: var(–accent2); box-shadow: 0 4px 16px var(–accent-glow); }
+
+/* ─── MAIN CONTENT ─── */
+.main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+
+.topbar {
+display: flex;
+align-items: center;
+gap: 12px;
+padding: 14px 24px;
+border-bottom: 1px solid var(–border);
+background: var(–surface);
+}
+
+.topbar-title {
+font-size: 16px;
+font-weight: 700;
+flex: 1;
+}
+
+.topbar-btn {
+display: flex;
+align-items: center;
+gap: 6px;
+padding: 7px 14px;
+border-radius: var(–sm-radius);
+border: 1px solid var(–border);
+background: var(–surface2);
+color: var(–text2);
+font-family: ‘Syne’, sans-serif;
+font-size: 12.5px;
+font-weight: 600;
+cursor: pointer;
+transition: all 0.15s;
+}
+
+.topbar-btn:hover { border-color: var(–border2); color: var(–text); }
+
+.topbar-btn.accent {
+background: var(–accent);
+border-color: var(–accent);
+color: white;
+}
+.topbar-btn.accent:hover {
+background: var(–accent2);
+box-shadow: 0 4px 16px var(–accent-glow);
+}
+
+.view-toggle {
+display: flex;
+gap: 2px;
+background: var(–surface2);
+border: 1px solid var(–border);
+border-radius: var(–sm-radius);
+padding: 3px;
+}
+
+.view-btn {
+padding: 5px 10px;
+border-radius: 4px;
+border: none;
+background: none;
+color: var(–text3);
+font-size: 13px;
+cursor: pointer;
+transition: all 0.15s;
+}
+
+.view-btn.active {
+background: var(–surface3);
+color: var(–text);
+}
+
+/* ─── CONTENT AREA ─── */
+.content { flex: 1; overflow-y: auto; padding: 24px; }
+.content::-webkit-scrollbar { width: 6px; }
+.content::-webkit-scrollbar-track { background: transparent; }
+.content::-webkit-scrollbar-thumb { background: var(–border2); border-radius: 4px; }
+
+/* ─── GRID VIEW ─── */
+.cards-grid {
+display: grid;
+grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+gap: 14px;
+}
+
+.card-tile {
+background: var(–surface);
+border: 1px solid var(–border);
+border-radius: var(–card-radius);
+padding: 18px;
+cursor: pointer;
+transition: all 0.2s;
+position: relative;
+min-height: 140px;
+display: flex;
+flex-direction: column;
+}
+
+.card-tile:hover {
+border-color: var(–border2);
+transform: translateY(-2px);
+box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+}
+
+.card-tile .front {
+font-size: 13.5px;
+font-weight: 600;
+color: var(–text);
+line-height: 1.5;
+flex: 1;
+font-family: ‘Instrument Serif’, serif;
+}
+
+.card-tile .back {
+font-size: 12px;
+color: var(–text2);
+line-height: 1.5;
+margin-top: 10px;
+padding-top: 10px;
+border-top: 1px solid var(–border);
+font-family: ‘DM Mono’, monospace;
+display: -webkit-box;
+-webkit-line-clamp: 2;
+-webkit-box-orient: vertical;
+overflow: hidden;
+}
+
+.card-tile .card-meta {
+display: flex;
+align-items: center;
+gap: 6px;
+margin-top: 10px;
+}
+
+.due-badge {
+font-size: 10px;
+font-family: ‘DM Mono’, monospace;
+padding: 2px 7px;
+border-radius: 20px;
+font-weight: 400;
+}
+
+.due-badge.new { background: rgba(124,106,247,0.15); color: var(–accent2); }
+.due-badge.due { background: rgba(251,191,36,0.15); color: var(–yellow); }
+.due-badge.learned { background: rgba(74,222,128,0.15); color: var(–green); }
+
+.card-tile.add-new {
+border-style: dashed;
+align-items: center;
+justify-content: center;
+min-height: 140px;
+color: var(–text3);
+font-size: 13px;
+gap: 8px;
+flex-direction: column;
+}
+
+.card-tile.add-new:hover { color: var(–accent2); border-color: var(–accent); }
+.add-new-icon { font-size: 24px; }
+
+/* ─── DECKS HOME ─── */
+.decks-grid {
+display: grid;
+grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+gap: 14px;
+}
+
+.deck-tile {
+background: var(–surface);
+border: 1px solid var(–border);
+border-radius: var(–card-radius);
+padding: 20px;
+cursor: pointer;
+transition: all 0.2s;
+position: relative;
+overflow: hidden;
+}
+
+.deck-tile:hover {
+transform: translateY(-2px);
+box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+}
+
+.deck-tile::before {
+content: ‘’;
+position: absolute;
+top: 0; left: 0; right: 0;
+height: 3px;
+background: var(–deck-color, var(–accent));
+}
+
+.deck-tile-icon {
+font-size: 28px;
+margin-bottom: 12px;
+}
+
+.deck-tile-name {
+font-size: 15px;
+font-weight: 700;
+margin-bottom: 4px;
+}
+
+.deck-tile-count {
+font-size: 12px;
+color: var(–text3);
+font-family: ‘DM Mono’, monospace;
+}
+
+.deck-tile-stats {
+display: flex;
+gap: 10px;
+margin-top: 14px;
+}
+
+.stat-pill {
+font-size: 11px;
+font-family: ‘DM Mono’, monospace;
+padding: 3px 8px;
+border-radius: 20px;
+}
+
+.deck-tile.add-new {
+border-style: dashed;
+display: flex;
+flex-direction: column;
+align-items: center;
+justify-content: center;
+color: var(–text3);
+gap: 8px;
+min-height: 160px;
+}
+
+.deck-tile.add-new:hover { color: var(–accent2); border-color: var(–accent); }
+
+/* ─── STUDY MODE ─── */
+.study-mode {
+display: flex;
+flex-direction: column;
+align-items: center;
+justify-content: center;
+height: 100%;
+gap: 28px;
+padding: 40px;
+}
+
+.study-progress {
+width: 100%;
+max-width: 600px;
+display: flex;
+align-items: center;
+gap: 14px;
+font-size: 13px;
+color: var(–text2);
+font-family: ‘DM Mono’, monospace;
+}
+
+.progress-bar {
+flex: 1;
+height: 4px;
+background: var(–surface3);
+border-radius: 2px;
+overflow: hidden;
+}
+
+.progress-fill {
+height: 100%;
+background: linear-gradient(90deg, var(–accent), var(–accent2));
+border-radius: 2px;
+transition: width 0.3s;
+}
+
+.flashcard {
+width: 100%;
+max-width: 600px;
+min-height: 320px;
+background: var(–surface);
+border: 1px solid var(–border2);
+border-radius: 20px;
+padding: 40px;
+display: flex;
+flex-direction: column;
+align-items: center;
+justify-content: center;
+cursor: pointer;
+position: relative;
+transition: all 0.3s;
+box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+}
+
+.flashcard:hover { box-shadow: 0 24px 80px rgba(0,0,0,0.5); }
+
+.flashcard.flipped { background: var(–surface2); }
+
+.card-side-label {
+position: absolute;
+top: 18px;
+left: 20px;
+font-size: 10px;
+font-weight: 600;
+letter-spacing: 1.5px;
+text-transform: uppercase;
+color: var(–text3);
+font-family: ‘DM Mono’, monospace;
+}
+
+.flashcard .question {
+font-family: ‘Instrument Serif’, serif;
+font-size: 24px;
+text-align: center;
+line-height: 1.5;
+color: var(–text);
+}
+
+.flashcard .answer {
+font-family: ‘DM Mono’, monospace;
+font-size: 15px;
+text-align: center;
+line-height: 1.7;
+color: var(–text2);
+margin-top: 20px;
+padding-top: 20px;
+border-top: 1px solid var(–border);
+width: 100%;
+}
+
+.flip-hint {
+font-size: 12px;
+color: var(–text3);
+font-family: ‘DM Mono’, monospace;
+}
+
+.rating-btns {
+display: flex;
+gap: 12px;
+width: 100%;
+max-width: 600px;
+}
+
+.rating-btn {
+flex: 1;
+padding: 14px;
+border-radius: var(–radius);
+border: 1px solid var(–border);
+background: var(–surface);
+color: var(–text);
+font-family: ‘Syne’, sans-serif;
+font-size: 13px;
+font-weight: 600;
+cursor: pointer;
+transition: all 0.15s;
+text-align: center;
+}
+
+.rating-btn:hover { transform: translateY(-2px); }
+.rating-btn.again { border-color: var(–red); }
+.rating-btn.again:hover { background: rgba(248,113,113,0.1); color: var(–red); }
+.rating-btn.hard { border-color: var(–yellow); }
+.rating-btn.hard:hover { background: rgba(251,191,36,0.1); color: var(–yellow); }
+.rating-btn.good { border-color: var(–green); }
+.rating-btn.good:hover { background: rgba(74,222,128,0.1); color: var(–green); }
+.rating-btn.easy { border-color: var(–accent2); }
+.rating-btn.easy:hover { background: var(–accent-glow); color: var(–accent2); }
+
+.rating-sub { font-size: 10px; font-weight: 400; color: var(–text3); margin-top: 3px; font-family: ‘DM Mono’, monospace; }
+
+/* ─── MODAL ─── */
+.modal-overlay {
+position: fixed;
+inset: 0;
+background: rgba(0,0,0,0.7);
+backdrop-filter: blur(8px);
+z-index: 1000;
+display: flex;
+align-items: center;
+justify-content: center;
+padding: 20px;
+opacity: 0;
+pointer-events: none;
+transition: opacity 0.2s;
+}
+
+.modal-overlay.open { opacity: 1; pointer-events: all; }
+
+.modal {
+background: var(–surface);
+border: 1px solid var(–border2);
+border-radius: 18px;
+width: 100%;
+max-width: 560px;
+max-height: 90vh;
+overflow-y: auto;
+box-shadow: 0 40px 100px rgba(0,0,0,0.6);
+transform: translateY(20px);
+transition: transform 0.2s;
+}
+
+.modal-overlay.open .modal { transform: translateY(0); }
+
+.modal-header {
+display: flex;
+align-items: center;
+justify-content: space-between;
+padding: 22px 24px 18px;
+border-bottom: 1px solid var(–border);
+}
+
+.modal-title { font-size: 17px; font-weight: 700; }
+
+.modal-close {
+width: 30px; height: 30px;
+border-radius: 50%;
+border: none;
+background: var(–surface2);
+color: var(–text2);
+font-size: 16px;
+cursor: pointer;
+display: flex; align-items: center; justify-content: center;
+transition: all 0.15s;
+}
+
+.modal-close:hover { background: var(–surface3); color: var(–text); }
+
+.modal-body { padding: 22px 24px; }
+
+.form-group { margin-bottom: 18px; }
+
+.form-label {
+display: block;
+font-size: 12px;
+font-weight: 600;
+letter-spacing: 0.8px;
+text-transform: uppercase;
+color: var(–text3);
+margin-bottom: 8px;
+}
+
+.form-input, .form-textarea {
+width: 100%;
+background: var(–surface2);
+border: 1px solid var(–border);
+border-radius: var(–sm-radius);
+padding: 11px 14px;
+color: var(–text);
+font-family: ‘Syne’, sans-serif;
+font-size: 14px;
+outline: none;
+transition: border-color 0.15s;
+}
+
+.form-textarea {
+font-family: ‘DM Mono’, monospace;
+font-size: 13px;
+resize: vertical;
+min-height: 100px;
+line-height: 1.6;
+}
+
+.form-input:focus, .form-textarea:focus { border-color: var(–accent); }
+
+.color-row {
+display: flex;
+gap: 8px;
+}
+
+.color-dot {
+width: 26px; height: 26px;
+border-radius: 50%;
+cursor: pointer;
+border: 2px solid transparent;
+transition: all 0.15s;
+}
+
+.color-dot.selected { border-color: white; transform: scale(1.15); }
+
+.modal-footer {
+padding: 16px 24px 20px;
+border-top: 1px solid var(–border);
+display: flex;
+gap: 10px;
+justify-content: flex-end;
+}
+
+.btn {
+padding: 10px 20px;
+border-radius: var(–sm-radius);
+border: 1px solid var(–border);
+font-family: ‘Syne’, sans-serif;
+font-size: 13.5px;
+font-weight: 600;
+cursor: pointer;
+transition: all 0.15s;
+}
+
+.btn-ghost { background: none; color: var(–text2); }
+.btn-ghost:hover { background: var(–surface2); color: var(–text); }
+
+.btn-primary {
+background: var(–accent);
+border-color: var(–accent);
+color: white;
+}
+.btn-primary:hover {
+background: var(–accent2);
+box-shadow: 0 4px 16px var(–accent-glow);
+}
+
+/* ─── EMPTY STATE ─── */
+.empty-state {
+display: flex;
+flex-direction: column;
+align-items: center;
+justify-content: center;
+height: 300px;
+color: var(–text3);
+gap: 12px;
+text-align: center;
+}
+
+.empty-icon { font-size: 48px; opacity: 0.4; }
+.empty-title { font-size: 16px; font-weight: 600; color: var(–text2); }
+.empty-sub { font-size: 13px; }
+
+/* ─── GITHUB SYNC PANEL ─── */
+.sync-panel {
+background: var(–surface2);
+border: 1px solid var(–border);
+border-radius: var(–radius);
+padding: 20px;
+margin-bottom: 20px;
+}
+
+.sync-title { font-size: 14px; font-weight: 700; margin-bottom: 4px; }
+.sync-sub { font-size: 12px; color: var(–text2); margin-bottom: 14px; line-height: 1.5; }
+.sync-status {
+display: inline-flex;
+align-items: center;
+gap: 6px;
+font-size: 11px;
+font-family: ‘DM Mono’, monospace;
+padding: 4px 10px;
+border-radius: 20px;
+margin-bottom: 14px;
+}
+
+.sync-status.connected { background: rgba(74,222,128,0.15); color: var(–green); }
+.sync-status.disconnected { background: rgba(248,113,113,0.15); color: var(–red); }
+.sync-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+
+/* ─── NOTIFICATIONS ─── */
+.notif {
+position: fixed;
+bottom: 24px;
+right: 24px;
+background: var(–surface2);
+border: 1px solid var(–border2);
+border-radius: var(–radius);
+padding: 12px 18px;
+font-size: 13px;
+font-weight: 500;
+z-index: 9000;
+transform: translateY(80px);
+opacity: 0;
+transition: all 0.3s;
+box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+max-width: 300px;
+}
+
+.notif.show { transform: translateY(0); opacity: 1; }
+.notif.success { border-color: var(–green); color: var(–green); }
+.notif.error { border-color: var(–red); color: var(–red); }
+.notif.info { border-color: var(–accent); color: var(–accent2); }
+
+/* ─── COMPLETION SCREEN ─── */
+.complete-screen {
+display: flex;
+flex-direction: column;
+align-items: center;
+justify-content: center;
+height: 100%;
+gap: 16px;
+text-align: center;
+padding: 40px;
+}
+
+.complete-icon { font-size: 64px; }
+.complete-title { font-size: 28px; font-weight: 800; }
+.complete-sub { font-size: 14px; color: var(–text2); max-width: 400px; line-height: 1.6; }
+.complete-stats {
+display: flex;
+gap: 20px;
+margin-top: 10px;
+}
+
+.complete-stat {
+display: flex;
+flex-direction: column;
+align-items: center;
+gap: 4px;
+background: var(–surface2);
+border: 1px solid var(–border);
+border-radius: var(–radius);
+padding: 16px 24px;
+}
+
+.complete-stat-num { font-size: 28px; font-weight: 800; }
+.complete-stat-label { font-size: 11px; color: var(–text2); font-family: ‘DM Mono’, monospace; }
+
+/* ─── SEARCH BAR ─── */
+.search-wrap {
+position: relative;
+flex: 1;
+max-width: 320px;
+}
+
+.search-icon {
+position: absolute;
+left: 12px;
+top: 50%;
+transform: translateY(-50%);
+color: var(–text3);
+font-size: 14px;
+pointer-events: none;
+}
+
+.search-input {
+width: 100%;
+background: var(–surface2);
+border: 1px solid var(–border);
+border-radius: var(–sm-radius);
+padding: 8px 12px 8px 34px;
+color: var(–text);
+font-family: ‘Syne’, sans-serif;
+font-size: 13px;
+outline: none;
+transition: border-color 0.15s;
+}
+
+.search-input:focus { border-color: var(–accent); }
+.search-input::placeholder { color: var(–text3); }
+
+/* ─── RESPONSIVE ─── */
+@media (max-width: 700px) {
+.sidebar { width: 200px; min-width: 200px; }
+.cards-grid { grid-template-columns: 1fr 1fr; }
+}
+
+/* ─── ANIMATIONS ─── */
+@keyframes fadeIn {
+from { opacity: 0; transform: translateY(10px); }
+to { opacity: 1; transform: translateY(0); }
+}
+
+.fade-in { animation: fadeIn 0.25s ease forwards; }
+
+.card-tile { animation: fadeIn 0.2s ease both; }
+.card-tile:nth-child(1) { animation-delay: 0.02s; }
+.card-tile:nth-child(2) { animation-delay: 0.04s; }
+.card-tile:nth-child(3) { animation-delay: 0.06s; }
+.card-tile:nth-child(4) { animation-delay: 0.08s; }
+.card-tile:nth-child(5) { animation-delay: 0.10s; }
+
+.delete-btn {
+position: absolute;
+top: 10px; right: 10px;
+width: 24px; height: 24px;
+border-radius: 50%;
+border: none;
+background: var(–surface3);
+color: var(–text3);
+font-size: 12px;
+cursor: pointer;
+display: none;
+align-items: center;
+justify-content: center;
+transition: all 0.15s;
+}
+
+.card-tile:hover .delete-btn { display: flex; }
+.delete-btn:hover { background: rgba(248,113,113,0.2); color: var(–red); }
+
+.tab-bar {
+display: flex;
+gap: 2px;
+background: var(–surface2);
+border: 1px solid var(–border);
+border-radius: var(–sm-radius);
+padding: 3px;
+}
+
+.tab-btn {
+padding: 6px 14px;
+border-radius: 5px;
+border: none;
+background: none;
+color: var(–text3);
+font-family: ‘Syne’, sans-serif;
+font-size: 12.5px;
+font-weight: 600;
+cursor: pointer;
+transition: all 0.15s;
+}
+
+.tab-btn.active { background: var(–surface3); color: var(–text); }
+</style>
+
+</head>
+<body>
+
+<div class="app">
+  <!-- ─── SIDEBAR ─── -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="logo">
+        <div class="logo-icon">⚡</div>
+        Flashy
+      </div>
+    </div>
+
+```
+<div class="deck-list">
+  <div class="sidebar-section">Navigation</div>
+  <button class="sidebar-btn active" id="nav-home" onclick="showHome()">
+    <span class="icon">🏠</span> All Decks
+  </button>
+  <button class="sidebar-btn" id="nav-sync" onclick="showSync()">
+    <span class="icon">☁️</span> Sync & Export
+  </button>
+
+  <div class="sidebar-section" style="margin-top:8px;">Your Decks</div>
+  <div id="sidebar-decks"></div>
+</div>
+
+<div class="sidebar-footer">
+  <button class="footer-btn" onclick="openNewDeckModal()">+ Deck</button>
+  <button class="footer-btn primary" onclick="openNewCardModal()">+ Card</button>
+</div>
+```
+
+  </aside>
+
+  <!-- ─── MAIN ─── -->
+
+  <main class="main">
+    <!-- TOPBAR -->
+    <div class="topbar">
+      <div class="topbar-title" id="topbar-title">All Decks</div>
+      <div class="search-wrap" id="search-area" style="display:none">
+        <span class="search-icon">🔍</span>
+        <input class="search-input" id="search-input" placeholder="Search cards..." oninput="filterCards()">
+      </div>
+      <div id="topbar-actions"></div>
+    </div>
+
+```
+<!-- CONTENT -->
+<div class="content" id="content"></div>
+```
+
+  </main>
+</div>
+
+<!-- ─── MODALS ─── -->
+
+<!-- New Deck -->
+
+<div class="modal-overlay" id="modal-deck">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="deck-modal-title">New Deck</div>
+      <button class="modal-close" onclick="closeModal('modal-deck')">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">Deck Name</label>
+        <input class="form-input" id="deck-name" placeholder="e.g. Cardiology, Pharmacology...">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Emoji Icon</label>
+        <input class="form-input" id="deck-emoji" placeholder="🫀" maxlength="4">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Color</label>
+        <div class="color-row" id="color-picker"></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-deck')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveDeck()">Create Deck</button>
+    </div>
+  </div>
+</div>
+
+<!-- New / Edit Card -->
+
+<div class="modal-overlay" id="modal-card">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="card-modal-title">New Card</div>
+      <button class="modal-close" onclick="closeModal('modal-card')">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">Deck</label>
+        <select class="form-input" id="card-deck"></select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Front (Question)</label>
+        <textarea class="form-textarea" id="card-front" placeholder="What is the most common cause of mitral stenosis?"></textarea>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Back (Answer)</label>
+        <textarea class="form-textarea" id="card-back" placeholder="Rheumatic fever / Rheumatic heart disease"></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-card')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveCard()">Save Card</button>
+    </div>
+  </div>
+</div>
+
+<!-- Sync Modal -->
+
+<div class="modal-overlay" id="modal-sync-detail">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">GitHub Gist Sync</div>
+      <button class="modal-close" onclick="closeModal('modal-sync-detail')">×</button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:13px;color:var(--text2);margin-bottom:16px;line-height:1.6;">
+        Connect to a <strong style="color:var(--text)">GitHub Gist</strong> to sync your decks across any device — free, instant, and permanent.<br><br>
+        <strong style="color:var(--accent2)">Setup:</strong> Go to <code style="background:var(--surface3);padding:2px 6px;border-radius:4px;font-size:12px;">github.com/settings/tokens</code> → Generate new token → check <code style="background:var(--surface3);padding:2px 6px;border-radius:4px;font-size:12px;">gist</code> scope only.
+      </p>
+      <div class="form-group">
+        <label class="form-label">GitHub Personal Access Token</label>
+        <input class="form-input" id="gh-token" type="password" placeholder="ghp_xxxxxxxxxxxx">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Gist ID (leave blank to create new)</label>
+        <input class="form-input" id="gh-gist-id" placeholder="auto-created on first sync">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-sync-detail')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveGithubConfig()">Connect & Sync</button>
+    </div>
+  </div>
+</div>
+
+<!-- Notification -->
+
+<div class="notif" id="notif"></div>
+
+<script>
+// ─────────────────────────────────────────────
+// STATE
+// ─────────────────────────────────────────────
+const COLORS = ['#7c6af7','#f472b6','#34d399','#fbbf24','#60a5fa','#f87171','#a78bfa','#2dd4bf'];
+let state = {
+  decks: [],
+  cards: [],
+  currentDeck: null,
+  view: 'grid',
+  editingCard: null,
+  editingDeck: null,
+  studyQueue: [],
+  studyIdx: 0,
+  studyFlipped: false,
+  studyStats: { again: 0, hard: 0, good: 0, easy: 0 },
+  gh: { token: '', gistId: '' }
+};
+
+// ─── LOAD FROM LOCALSTORAGE ───
+function loadState() {
+  const saved = localStorage.getItem('flashy_state');
+  if (saved) {
+    const parsed = JSON.parse(saved);
+    state.decks = parsed.decks || [];
+    state.cards = parsed.cards || [];
+    state.gh = parsed.gh || { token: '', gistId: '' };
+  }
+  if (state.decks.length === 0) seedSampleData();
+}
+
+function saveState() {
+  localStorage.setItem('flashy_state', JSON.stringify({
+    decks: state.decks,
+    cards: state.cards,
+    gh: state.gh
+  }));
+}
+
+function seedSampleData() {
+  const d1 = { id: uid(), name: 'Cardiology', emoji: '🫀', color: '#f472b6' };
+  const d2 = { id: uid(), name: 'Pharmacology', emoji: '💊', color: '#34d399' };
+  const d3 = { id: uid(), name: 'Neurology', emoji: '🧠', color: '#7c6af7' };
+  state.decks = [d1, d2, d3];
+
+  state.cards = [
+    { id: uid(), deckId: d1.id, front: 'Most common cause of mitral stenosis?', back: 'Rheumatic fever / Rheumatic heart disease', status: 'new', interval: 0, due: Date.now() },
+    { id: uid(), deckId: d1.id, front: 'Murmur of mitral stenosis — character & timing?', back: 'Low-pitched rumbling mid-diastolic murmur, heard best at apex with bell in left lateral position. Presystolic accentuation in sinus rhythm.', status: 'new', interval: 0, due: Date.now() },
+    { id: uid(), deckId: d1.id, front: 'Opening snap of mitral stenosis — what does a shorter A2-OS interval indicate?', back: 'More severe stenosis (higher left atrial pressure causes earlier opening)', status: 'learned', interval: 3, due: Date.now() + 86400000*3 },
+    { id: uid(), deckId: d2.id, front: 'Drug of choice for Wolff-Parkinson-White syndrome with AF?', back: 'Procainamide (IV) — CCBs, digoxin, and adenosine are contraindicated as they may accelerate accessory pathway conduction', status: 'due', interval: 1, due: Date.now() - 1000 },
+    { id: uid(), deckId: d2.id, front: 'Mechanism of action of Metformin?', back: 'Activates AMPK → inhibits hepatic gluconeogenesis. Also improves peripheral insulin sensitivity. Does not cause hypoglycemia.', status: 'new', interval: 0, due: Date.now() },
+    { id: uid(), deckId: d3.id, front: 'Triad of Normal Pressure Hydrocephalus?', back: 'Wet, Wacky, Wobbly — Urinary incontinence + Dementia + Gait apraxia (magnetic gait)', status: 'new', interval: 0, due: Date.now() },
+  ];
+  saveState();
+}
+
+function uid() { return Math.random().toString(36).slice(2,10) + Date.now().toString(36); }
+
+// ─────────────────────────────────────────────
+// RENDER SIDEBAR
+// ─────────────────────────────────────────────
+function renderSidebar() {
+  const container = document.getElementById('sidebar-decks');
+  container.innerHTML = state.decks.map(d => {
+    const count = state.cards.filter(c => c.deckId === d.id).length;
+    const active = state.currentDeck?.id === d.id ? 'active' : '';
+    return `<div class="deck-item ${active}" onclick="openDeck('${d.id}')">
+      <span style="font-size:14px">${d.emoji || '📦'}</span>
+      <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${d.name}</span>
+      <span class="deck-count">${count}</span>
+    </div>`;
+  }).join('');
+}
+
+// ─────────────────────────────────────────────
+// VIEWS
+// ─────────────────────────────────────────────
+function setNavActive(id) {
+  document.querySelectorAll('.sidebar-btn').forEach(b => b.classList.remove('active'));
+  if (id) document.getElementById(id)?.classList.add('active');
+}
+
+function showHome() {
+  state.currentDeck = null;
+  setNavActive('nav-home');
+  document.getElementById('topbar-title').textContent = 'All Decks';
+  document.getElementById('search-area').style.display = 'none';
+
+  document.getElementById('topbar-actions').innerHTML = `
+    <button class="topbar-btn accent" onclick="openNewDeckModal()">+ New Deck</button>
+  `;
+
+  const content = document.getElementById('content');
+  const totalDue = state.cards.filter(c => c.status === 'due' || (c.status === 'new')).length;
+
+  let html = '';
+  if (totalDue > 0) {
+    html += `<div style="margin-bottom:20px;padding:16px 20px;background:linear-gradient(135deg,rgba(124,106,247,0.12),rgba(192,132,252,0.08));border:1px solid rgba(124,106,247,0.25);border-radius:var(--radius);display:flex;align-items:center;gap:14px">
+      <div style="font-size:28px">⚡</div>
+      <div>
+        <div style="font-size:14px;font-weight:700;margin-bottom:2px">${totalDue} cards ready to study</div>
+        <div style="font-size:12px;color:var(--text2)">Keep your streak going</div>
+      </div>
+      <button class="topbar-btn accent" style="margin-left:auto" onclick="studyAll()">Study All</button>
+    </div>`;
+  }
+
+  html += `<div class="decks-grid">`;
+  html += state.decks.map(d => {
+    const cards = state.cards.filter(c => c.deckId === d.id);
+    const newCards = cards.filter(c => c.status === 'new').length;
+    const due = cards.filter(c => c.status === 'due').length;
+    const learned = cards.filter(c => c.status === 'learned').length;
+    return `<div class="deck-tile" style="--deck-color:${d.color}" onclick="openDeck('${d.id}')">
+      <div class="deck-tile-icon">${d.emoji || '📦'}</div>
+      <div class="deck-tile-name">${d.name}</div>
+      <div class="deck-tile-count">${cards.length} card${cards.length !== 1 ? 's' : ''}</div>
+      <div class="deck-tile-stats">
+        ${newCards > 0 ? `<span class="stat-pill" style="background:rgba(124,106,247,0.12);color:var(--accent2)">${newCards} new</span>` : ''}
+        ${due > 0 ? `<span class="stat-pill" style="background:rgba(251,191,36,0.12);color:var(--yellow)">${due} due</span>` : ''}
+        ${learned > 0 ? `<span class="stat-pill" style="background:rgba(74,222,128,0.12);color:var(--green)">${learned} learned</span>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+
+  html += `<div class="deck-tile add-new" onclick="openNewDeckModal()">
+    <div style="font-size:28px;opacity:0.4">+</div>
+    <div style="font-size:13px;font-weight:600">New Deck</div>
+  </div></div>`;
+
+  content.innerHTML = html;
+  renderSidebar();
+}
+
+function openDeck(deckId) {
+  state.currentDeck = state.decks.find(d => d.id === deckId);
+  if (!state.currentDeck) return;
+
+  document.querySelectorAll('.deck-item').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.sidebar-btn').forEach(b => b.classList.remove('active'));
+
+  document.getElementById('topbar-title').textContent = `${state.currentDeck.emoji} ${state.currentDeck.name}`;
+  document.getElementById('search-area').style.display = 'flex';
+  document.getElementById('search-input').value = '';
+
+  document.getElementById('topbar-actions').innerHTML = `
+    <div class="view-toggle">
+      <button class="view-btn ${state.view === 'grid' ? 'active' : ''}" onclick="setView('grid')">⊞ Grid</button>
+      <button class="view-btn ${state.view === 'list' ? 'active' : ''}" onclick="setView('list')">☰ List</button>
+    </div>
+    <button class="topbar-btn" onclick="studyDeck('${deckId}')" style="margin-left:8px">⚡ Cram</button>
+    <button class="topbar-btn accent" onclick="openNewCardModal('${deckId}')" style="margin-left:8px">+ Card</button>
+  `;
+
+  renderSidebar();
+  renderCards();
+}
+
+function setView(v) {
+  state.view = v;
+  if (state.currentDeck) openDeck(state.currentDeck.id);
+}
+
+function renderCards(query = '') {
+  const content = document.getElementById('content');
+  const deckId = state.currentDeck?.id;
+  let cards = state.cards.filter(c => c.deckId === deckId);
+  if (query) {
+    const q = query.toLowerCase();
+    cards = cards.filter(c => c.front.toLowerCase().includes(q) || c.back.toLowerCase().includes(q));
+  }
+
+  if (state.view === 'grid') {
+    let html = `<div class="cards-grid">`;
+    html += cards.map(c => {
+      const badge = c.status === 'new' ? '<span class="due-badge new">New</span>' :
+                    c.status === 'due' ? '<span class="due-badge due">Due</span>' :
+                    '<span class="due-badge learned">Learned</span>';
+      return `<div class="card-tile" onclick="editCard('${c.id}')">
+        <button class="delete-btn" onclick="event.stopPropagation();deleteCard('${c.id}')">×</button>
+        <div class="front">${escHtml(c.front)}</div>
+        <div class="back">${escHtml(c.back)}</div>
+        <div class="card-meta">${badge}</div>
+      </div>`;
+    }).join('');
+
+    html += `<div class="card-tile add-new" onclick="openNewCardModal('${deckId}')">
+      <div class="add-new-icon">+</div>
+      <div>New Card</div>
+    </div></div>`;
+
+    content.innerHTML = html;
+
+  } else {
+    let html = `<div style="display:flex;flex-direction:column;gap:8px">`;
+    html += cards.map(c => {
+      const badge = c.status === 'new' ? '<span class="due-badge new">New</span>' :
+                    c.status === 'due' ? '<span class="due-badge due">Due</span>' :
+                    '<span class="due-badge learned">Learned</span>';
+      return `<div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px;cursor:pointer;transition:all 0.15s;display:flex;align-items:center;gap:16px" onclick="editCard('${c.id}')" onmouseover="this.style.borderColor='var(--border2)'" onmouseout="this.style.borderColor='var(--border)'">
+        <div style="flex:1;min-width:0">
+          <div style="font-family:'Instrument Serif',serif;font-size:14px;margin-bottom:4px">${escHtml(c.front)}</div>
+          <div style="font-size:12px;color:var(--text2);font-family:'DM Mono',monospace;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escHtml(c.back)}</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;flex-shrink:0">
+          ${badge}
+          <button style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:16px;padding:4px" onclick="event.stopPropagation();deleteCard('${c.id}')">×</button>
+        </div>
+      </div>`;
+    }).join('');
+
+    html += `<div style="background:var(--surface);border:1px dashed var(--border);border-radius:var(--radius);padding:16px 18px;cursor:pointer;text-align:center;color:var(--text3);font-size:13px;transition:all 0.15s" onclick="openNewCardModal('${deckId}')" onmouseover="this.style.color='var(--accent2)';this.style.borderColor='var(--accent)'" onmouseout="this.style.color='var(--text3)';this.style.borderColor='var(--border)'">+ New Card</div></div>`;
+
+    content.innerHTML = html;
+  }
+
+  if (cards.length === 0 && !query) {
+    content.innerHTML += `<div class="empty-state">
+      <div class="empty-icon">🗃️</div>
+      <div class="empty-title">No cards yet</div>
+      <div class="empty-sub">Add your first card to start studying</div>
+    </div>`;
+  }
+}
+
+function filterCards() {
+  const q = document.getElementById('search-input').value;
+  renderCards(q);
+}
+
+// ─────────────────────────────────────────────
+// STUDY MODE
+// ─────────────────────────────────────────────
+function studyDeck(deckId) {
+  const queue = state.cards.filter(c => c.deckId === deckId && (c.status === 'new' || c.status === 'due'));
+  startStudy(queue);
+}
+
+function studyAll() {
+  const queue = state.cards.filter(c => c.status === 'new' || c.status === 'due');
+  startStudy(queue);
+}
+
+function startStudy(queue) {
+  if (queue.length === 0) { showNotif('No cards due right now! 🎉', 'success'); return; }
+  state.studyQueue = shuffle([...queue]);
+  state.studyIdx = 0;
+  state.studyFlipped = false;
+  state.studyStats = { again: 0, hard: 0, good: 0, easy: 0 };
+  state.currentDeck = null;
+  renderSidebar();
+  document.getElementById('topbar-title').textContent = 'Study Session';
+  document.getElementById('search-area').style.display = 'none';
+  document.getElementById('topbar-actions').innerHTML = `
+    <button class="topbar-btn" onclick="showHome()">✕ End Session</button>
+  `;
+  renderStudy();
+}
+
+function renderStudy() {
+  const content = document.getElementById('content');
+  if (state.studyIdx >= state.studyQueue.length) {
+    renderComplete(); return;
+  }
+
+  const card = state.studyQueue[state.studyIdx];
+  const total = state.studyQueue.length;
+  const pct = Math.round((state.studyIdx / total) * 100);
+
+  content.innerHTML = `<div class="study-mode fade-in">
+    <div class="study-progress">
+      <span>${state.studyIdx + 1} / ${total}</span>
+      <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
+      <span>${pct}%</span>
+    </div>
+
+    <div class="flashcard ${state.studyFlipped ? 'flipped' : ''}" id="flashcard" onclick="flipCard()">
+      <div class="card-side-label">${state.studyFlipped ? 'Back' : 'Front'}</div>
+      <div class="question">${escHtml(card.front)}</div>
+      ${state.studyFlipped ? `<div class="answer">${escHtml(card.back)}</div>` : ''}
+    </div>
+
+    ${state.studyFlipped
+      ? `<div class="rating-btns">
+          <button class="rating-btn again" onclick="rate('again')">
+            Again<div class="rating-sub">< 1 min</div>
+          </button>
+          <button class="rating-btn hard" onclick="rate('hard')">
+            Hard<div class="rating-sub">Tomorrow</div>
+          </button>
+          <button class="rating-btn good" onclick="rate('good')">
+            Good<div class="rating-sub">3 days</div>
+          </button>
+          <button class="rating-btn easy" onclick="rate('easy')">
+            Easy<div class="rating-sub">1 week</div>
+          </button>
+        </div>`
+      : `<div class="flip-hint">Tap card to reveal answer</div>`
+    }
+  </div>`;
+}
+
+function flipCard() {
+  state.studyFlipped = !state.studyFlipped;
+  renderStudy();
+}
+
+function rate(rating) {
+  const card = state.studyQueue[state.studyIdx];
+  state.studyStats[rating]++;
+
+  const now = Date.now();
+  const intervals = { again: 0, hard: 1, good: 3, easy: 7 };
+  const newInterval = intervals[rating];
+
+  const idx = state.cards.findIndex(c => c.id === card.id);
+  if (idx !== -1) {
+    state.cards[idx].interval = newInterval;
+    state.cards[idx].status = newInterval === 0 ? 'due' : 'learned';
+    state.cards[idx].due = now + newInterval * 86400000;
+  }
+
+  if (rating === 'again') {
+    state.studyQueue.push(card); // re-add to end
+  }
+
+  state.studyIdx++;
+  state.studyFlipped = false;
+  saveState();
+  renderStudy();
+}
+
+function renderComplete() {
+  const s = state.studyStats;
+  const total = s.again + s.hard + s.good + s.easy;
+  const content = document.getElementById('content');
+  content.innerHTML = `<div class="complete-screen fade-in">
+    <div class="complete-icon">🎉</div>
+    <div class="complete-title">Session Complete!</div>
+    <div class="complete-sub">You've reviewed ${total} cards. Keep up the consistency — that's how NEET PG gets cracked.</div>
+    <div class="complete-stats">
+      <div class="complete-stat">
+        <div class="complete-stat-num" style="color:var(--red)">${s.again}</div>
+        <div class="complete-stat-label">Again</div>
+      </div>
+      <div class="complete-stat">
+        <div class="complete-stat-num" style="color:var(--yellow)">${s.hard}</div>
+        <div class="complete-stat-label">Hard</div>
+      </div>
+      <div class="complete-stat">
+        <div class="complete-stat-num" style="color:var(--green)">${s.good}</div>
+        <div class="complete-stat-label">Good</div>
+      </div>
+      <div class="complete-stat">
+        <div class="complete-stat-num" style="color:var(--accent2)">${s.easy}</div>
+        <div class="complete-stat-label">Easy</div>
+      </div>
+    </div>
+    <button class="btn btn-primary" style="margin-top:8px" onclick="showHome()">Back to Decks</button>
+  </div>`;
+}
+
+// ─────────────────────────────────────────────
+// SYNC PAGE
+// ─────────────────────────────────────────────
+function showSync() {
+  state.currentDeck = null;
+  setNavActive('nav-sync');
+  document.getElementById('topbar-title').textContent = 'Sync & Export';
+  document.getElementById('search-area').style.display = 'none';
+  renderSidebar();
+
+  const isConnected = !!state.gh.token;
+  document.getElementById('topbar-actions').innerHTML = '';
+
+  const content = document.getElementById('content');
+  content.innerHTML = `<div class="fade-in" style="max-width:600px">
+
+    <div class="sync-panel">
+      <div class="sync-title">☁️ GitHub Gist Sync</div>
+      <div class="sync-sub">Your cards are stored in your browser. Connect GitHub Gist to back them up and access across devices — free, forever.</div>
+      <div class="sync-status ${isConnected ? 'connected' : 'disconnected'}">
+        <span class="sync-dot"></span>
+        ${isConnected ? `Connected · Gist: ${state.gh.gistId || 'auto'}` : 'Not connected'}
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn btn-primary" onclick="openModal('modal-sync-detail')">${isConnected ? '⚙️ Edit Config' : '🔗 Connect Gist'}</button>
+        ${isConnected ? `<button class="btn btn-ghost" onclick="syncToGist()">↑ Push to Gist</button>
+        <button class="btn btn-ghost" onclick="syncFromGist()">↓ Pull from Gist</button>` : ''}
+      </div>
+    </div>
+
+    <div class="sync-panel" style="margin-top:14px">
+      <div class="sync-title">📤 Export</div>
+      <div class="sync-sub">Export your cards to share or import into other apps.</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:14px">
+        <button class="btn btn-ghost" onclick="exportJSON()">Export JSON backup</button>
+        <button class="btn btn-ghost" onclick="exportCSV()">Export CSV (for Anki import)</button>
+      </div>
+    </div>
+
+    <div class="sync-panel" style="margin-top:14px">
+      <div class="sync-title">📥 Import</div>
+      <div class="sync-sub">Import a JSON backup or Anki-style CSV.</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:14px">
+        <label class="btn btn-ghost" style="cursor:pointer">Import JSON <input type="file" accept=".json" style="display:none" onchange="importJSON(this)"></label>
+        <label class="btn btn-ghost" style="cursor:pointer">Import CSV (Anki) <input type="file" accept=".csv,.txt" style="display:none" onchange="importCSV(this)"></label>
+      </div>
+    </div>
+
+    <div style="margin-top:14px;padding:14px 18px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);font-size:12px;color:var(--text2);line-height:1.7">
+      <strong style="color:var(--text)">💡 Anki CSV Import Guide</strong><br>
+      In Anki: File → Import → select your CSV → set Field 1 = Front, Field 2 = Back. Done!<br>
+      Your SRS progress from Flashy will restart in Anki (Anki uses its own scheduling).
+    </div>
+  </div>`;
+}
+
+// ─────────────────────────────────────────────
+// GITHUB GIST SYNC
+// ─────────────────────────────────────────────
+function saveGithubConfig() {
+  const token = document.getElementById('gh-token').value.trim();
+  const gistId = document.getElementById('gh-gist-id').value.trim();
+  if (!token) { showNotif('Please enter a GitHub token', 'error'); return; }
+  state.gh.token = token;
+  state.gh.gistId = gistId;
+  saveState();
+  closeModal('modal-sync-detail');
+  showNotif('Connected! Pushing data...', 'info');
+  setTimeout(() => syncToGist(), 500);
+}
+
+async function syncToGist() {
+  if (!state.gh.token) { showNotif('Connect GitHub first', 'error'); return; }
+  showNotif('Syncing to Gist...', 'info');
+  try {
+    const data = JSON.stringify({ decks: state.decks, cards: state.cards }, null, 2);
+    const body = { description: 'Flashy - Flashcard Data', public: false, files: { 'flashy_data.json': { content: data } } };
+
+    let resp, json;
+    if (state.gh.gistId) {
+      resp = await fetch(`https://api.github.com/gists/${state.gh.gistId}`, {
+        method: 'PATCH', headers: { Authorization: `token ${state.gh.token}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+    } else {
+      resp = await fetch('https://api.github.com/gists', {
+        method: 'POST', headers: { Authorization: `token ${state.gh.token}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+    }
+    json = await resp.json();
+    if (json.id) {
+      state.gh.gistId = json.id;
+      saveState();
+      showNotif('Synced! Gist ID saved ✓', 'success');
+      if (document.getElementById('topbar-title').textContent === 'Sync & Export') showSync();
+    } else {
+      showNotif('Sync failed: ' + (json.message || 'Unknown error'), 'error');
+    }
+  } catch(e) {
+    showNotif('Sync error: ' + e.message, 'error');
+  }
+}
+
+async function syncFromGist() {
+  if (!state.gh.token || !state.gh.gistId) { showNotif('Connect & push first', 'error'); return; }
+  showNotif('Pulling from Gist...', 'info');
+  try {
+    const resp = await fetch(`https://api.github.com/gists/${state.gh.gistId}`, {
+      headers: { Authorization: `token ${state.gh.token}` }
+    });
+    const json = await resp.json();
+    const raw = json.files?.['flashy_data.json']?.content;
+    if (!raw) { showNotif('No data found in Gist', 'error'); return; }
+    const parsed = JSON.parse(raw);
+    state.decks = parsed.decks || [];
+    state.cards = parsed.cards || [];
+    saveState();
+    showNotif('Pulled successfully ✓', 'success');
+    showSync();
+  } catch(e) {
+    showNotif('Pull error: ' + e.message, 'error');
+  }
+}
+
+// ─────────────────────────────────────────────
+// EXPORT / IMPORT
+// ─────────────────────────────────────────────
+function exportJSON() {
+  const data = JSON.stringify({ decks: state.decks, cards: state.cards }, null, 2);
+  download('flashy_backup.json', data, 'application/json');
+  showNotif('JSON exported ✓', 'success');
+}
+
+function exportCSV() {
+  const rows = ['Front,Back,Deck,Status'];
+  state.cards.forEach(c => {
+    const deck = state.decks.find(d => d.id === c.deckId)?.name || '';
+    rows.push(`"${esc(c.front)}","${esc(c.back)}","${deck}","${c.status}"`);
+  });
+  download('flashy_anki.csv', rows.join('\n'), 'text/csv');
+  showNotif('CSV exported ✓', 'success');
+}
+
+function importJSON(input) {
+  const file = input.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const parsed = JSON.parse(e.target.result);
+      if (parsed.decks && parsed.cards) {
+        state.decks = parsed.decks;
+        state.cards = parsed.cards;
+        saveState();
+        showNotif(`Imported ${state.decks.length} decks, ${state.cards.length} cards ✓`, 'success');
+        showHome();
+      } else { showNotif('Invalid file format', 'error'); }
+    } catch { showNotif('Could not parse file', 'error'); }
+  };
+  reader.readAsText(file);
+}
+
+function importCSV(input) {
+  const file = input.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    const lines = e.target.result.split('\n').filter(l => l.trim());
+    const startIdx = lines[0].toLowerCase().includes('front') ? 1 : 0;
+    let deck = state.decks[0];
+    if (!deck) {
+      deck = { id: uid(), name: 'Imported', emoji: '📥', color: '#7c6af7' };
+      state.decks.push(deck);
+    }
+    let count = 0;
+    lines.slice(startIdx).forEach(line => {
+      const parts = parseCSVLine(line);
+      if (parts.length >= 2 && parts[0] && parts[1]) {
+        state.cards.push({ id: uid(), deckId: deck.id, front: parts[0], back: parts[1], status: 'new', interval: 0, due: Date.now() });
+        count++;
+      }
+    });
+    saveState();
+    showNotif(`Imported ${count} cards ✓`, 'success');
+    showHome();
+  };
+  reader.readAsText(file);
+}
+
+function parseCSVLine(line) {
+  const result = []; let cur = ''; let inQ = false;
+  for (let i = 0; i < line.length; i++) {
+    if (line[i] === '"') { inQ = !inQ; }
+    else if (line[i] === ',' && !inQ) { result.push(cur.trim()); cur = ''; }
+    else { cur += line[i]; }
+  }
+  result.push(cur.trim());
+  return result;
+}
+
+// ─────────────────────────────────────────────
+// MODALS
+// ─────────────────────────────────────────────
+function openNewDeckModal() {
+  state.editingDeck = null;
+  document.getElementById('deck-modal-title').textContent = 'New Deck';
+  document.getElementById('deck-name').value = '';
+  document.getElementById('deck-emoji').value = '';
+  renderColorPicker(COLORS[0]);
+  openModal('modal-deck');
+}
+
+function renderColorPicker(selected) {
+  document.getElementById('color-picker').innerHTML = COLORS.map(c =>
+    `<div class="color-dot ${c === selected ? 'selected' : ''}" style="background:${c}" onclick="selectColor('${c}')"></div>`
+  ).join('');
+}
+
+function selectColor(c) { renderColorPicker(c); }
+
+function saveDeck() {
+  const name = document.getElementById('deck-name').value.trim();
+  if (!name) { showNotif('Please enter a deck name', 'error'); return; }
+  const emoji = document.getElementById('deck-emoji').value.trim() || '📦';
+  const selected = document.querySelector('.color-dot.selected');
+  const color = selected ? selected.style.background : COLORS[0];
+
+  if (state.editingDeck) {
+    const idx = state.decks.findIndex(d => d.id === state.editingDeck);
+    if (idx !== -1) { state.decks[idx].name = name; state.decks[idx].emoji = emoji; state.decks[idx].color = color; }
+  } else {
+    state.decks.push({ id: uid(), name, emoji, color });
+  }
+  saveState();
+  closeModal('modal-deck');
+  showHome();
+}
+
+function openNewCardModal(deckId) {
+  state.editingCard = null;
+  document.getElementById('card-modal-title').textContent = 'New Card';
+  document.getElementById('card-front').value = '';
+  document.getElementById('card-back').value = '';
+  populateDeckSelect(deckId || state.currentDeck?.id);
+  openModal('modal-card');
+}
+
+function editCard(cardId) {
+  const card = state.cards.find(c => c.id === cardId);
+  if (!card) return;
+  state.editingCard = cardId;
+  document.getElementById('card-modal-title').textContent = 'Edit Card';
+  document.getElementById('card-front').value = card.front;
+  document.getElementById('card-back').value = card.back;
+  populateDeckSelect(card.deckId);
+  openModal('modal-card');
+}
+
+function populateDeckSelect(selectedId) {
+  document.getElementById('card-deck').innerHTML = state.decks.map(d =>
+    `<option value="${d.id}" ${d.id === selectedId ? 'selected' : ''}>${d.emoji} ${d.name}</option>`
+  ).join('');
+}
+
+function saveCard() {
+  const front = document.getElementById('card-front').value.trim();
+  const back = document.getElementById('card-back').value.trim();
+  const deckId = document.getElementById('card-deck').value;
+  if (!front || !back) { showNotif('Please fill both sides', 'error'); return; }
+
+  if (state.editingCard) {
+    const idx = state.cards.findIndex(c => c.id === state.editingCard);
+    if (idx !== -1) { state.cards[idx].front = front; state.cards[idx].back = back; state.cards[idx].deckId = deckId; }
+  } else {
+    state.cards.push({ id: uid(), deckId, front, back, status: 'new', interval: 0, due: Date.now() });
+  }
+  saveState();
+  closeModal('modal-card');
+  if (state.currentDeck) renderCards();
+  else showHome();
+  showNotif(state.editingCard ? 'Card updated ✓' : 'Card added ✓', 'success');
+}
+
+function deleteCard(cardId) {
+  if (!confirm('Delete this card?')) return;
+  state.cards = state.cards.filter(c => c.id !== cardId);
+  saveState();
+  renderCards();
+}
+
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+// ─────────────────────────────────────────────
+// UTILITIES
+// ─────────────────────────────────────────────
+function escHtml(s) { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function esc(s) { return (s||'').replace(/"/g,'""'); }
+function shuffle(a) { for (let i=a.length-1;i>0;i--) { const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]; } return a; }
+function download(name, data, type) {
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([data], { type }));
+  a.download = name; a.click();
+}
+
+let notifTimer;
+function showNotif(msg, type = 'info') {
+  const el = document.getElementById('notif');
+  el.textContent = msg;
+  el.className = `notif show ${type}`;
+  clearTimeout(notifTimer);
+  notifTimer = setTimeout(() => { el.classList.remove('show'); }, 3000);
+}
+
+// Close modals on overlay click
+document.querySelectorAll('.modal-overlay').forEach(overlay => {
+  overlay.addEventListener('click', e => { if (e.target === overlay) overlay.classList.remove('open'); });
+});
+
+// Keyboard shortcuts
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') document.querySelectorAll('.modal-overlay').forEach(m => m.classList.remove('open'));
+  if (e.key === ' ' && state.studyQueue.length > 0 && state.studyIdx < state.studyQueue.length) {
+    e.preventDefault(); flipCard();
+  }
+  if (e.key === 'n' && !['INPUT','TEXTAREA','SELECT'].includes(document.activeElement.tagName)) {
+    openNewCardModal();
+  }
+});
+
+// Pre-fill sync modal from saved state
+document.getElementById('modal-sync-detail').addEventListener('click', () => {
+  if (state.gh.token) document.getElementById('gh-token').value = state.gh.token;
+  if (state.gh.gistId) document.getElementById('gh-gist-id').value = state.gh.gistId;
+});
+
+// ─────────────────────────────────────────────
+// INIT
+// ─────────────────────────────────────────────
+loadState();
+showHome();
+</script>
+
+</body>
+</html>
