@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flashy</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Mono:ital,wght@0,300;0,400;1,300&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0f0f11;--surface:#17171a;--surface2:#1e1e23;--surface3:#26262d;--border:#2e2e38;--border2:#3a3a48;--text:#e8e8f0;--text2:#9090a8;--text3:#5a5a72;--accent:#7c6af7;--accent2:#a594f9;--glow:rgba(124,106,247,.18);--green:#4ade80;--red:#f87171;--yellow:#fbbf24;--blue:#60a5fa;--r:14px;--r2:10px;--r3:6px}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Syne',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");pointer-events:none;z-index:9999;opacity:.4}
+.app{display:flex;height:100vh}
+/* sidebar */
+.sidebar{width:252px;min-width:252px;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden}
+.sidebar-header{padding:18px 16px 14px;border-bottom:1px solid var(--border)}
+.logo{font-size:21px;font-weight:800;letter-spacing:-.5px;background:linear-gradient(135deg,#fff 30%,var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;display:flex;align-items:center;gap:8px}
+.logo-icon{width:28px;height:28px;background:linear-gradient(135deg,var(--accent),#c084fc);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;-webkit-text-fill-color:white;flex-shrink:0;box-shadow:0 4px 12px rgba(124,106,247,.4)}
+.sb-sec{padding:12px 12px 5px;font-size:10px;font-weight:600;letter-spacing:1.5px;color:var(--text3);text-transform:uppercase}
+.sb-btn{display:flex;align-items:center;gap:10px;padding:8px 13px;margin:1px 7px;border-radius:var(--r3);cursor:pointer;font-family:'Syne',sans-serif;font-size:13px;font-weight:500;color:var(--text2);transition:all .15s;border:none;background:none;width:calc(100% - 14px);text-align:left}
+.sb-btn:hover{background:var(--surface2);color:var(--text)}.sb-btn.active{background:var(--glow);color:var(--accent2)}
+.sb-btn .ic{font-size:14px;width:18px;text-align:center}
+.deck-list{flex:1;overflow-y:auto;padding-bottom:8px}
+.deck-list::-webkit-scrollbar{width:3px}.deck-list::-webkit-scrollbar-thumb{background:var(--border2);border-radius:4px}
+.di{display:flex;align-items:center;gap:9px;padding:7px 13px;margin:1px 7px;border-radius:var(--r3);cursor:pointer;font-size:13px;font-weight:500;color:var(--text2);transition:all .15s}
+.di:hover{background:var(--surface2);color:var(--text)}.di.active{background:var(--glow);color:var(--accent2)}
+.dc{margin-left:auto;font-size:10px;font-family:'DM Mono',monospace;color:var(--text3);background:var(--surface3);padding:1px 6px;border-radius:20px}
+.sb-footer{padding:10px;border-top:1px solid var(--border);display:flex;gap:6px}
+.fb{flex:1;padding:8px;border-radius:var(--r3);border:1px solid var(--border);background:var(--surface2);color:var(--text2);font-family:'Syne',sans-serif;font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;text-align:center}
+.fb:hover{border-color:var(--accent);color:var(--accent2)}.fb.p{background:var(--accent);border-color:var(--accent);color:white}.fb.p:hover{background:var(--accent2)}
+/* main */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.topbar{display:flex;align-items:center;gap:10px;padding:12px 22px;border-bottom:1px solid var(--border);background:var(--surface);flex-wrap:wrap}
+.topbar-title{font-size:15px;font-weight:700;flex:1;min-width:80px}
+.tb-btn{display:flex;align-items:center;gap:6px;padding:6px 13px;border-radius:var(--r3);border:1px solid var(--border);background:var(--surface2);color:var(--text2);font-family:'Syne',sans-serif;font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;white-space:nowrap}
+.tb-btn:hover{border-color:var(--border2);color:var(--text)}.tb-btn.a{background:var(--accent);border-color:var(--accent);color:white}.tb-btn.a:hover{background:var(--accent2);box-shadow:0 4px 16px var(--glow)}
+.vtog{display:flex;gap:2px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--r3);padding:2px}
+.vb{padding:5px 10px;border-radius:4px;border:none;background:none;color:var(--text3);font-size:12px;cursor:pointer;transition:all .15s}.vb.active{background:var(--surface3);color:var(--text)}
+.sw{position:relative;flex:1;max-width:280px;min-width:100px}
+.si{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--text3);font-size:13px;pointer-events:none}
+.search-input{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:var(--r3);padding:7px 10px 7px 30px;color:var(--text);font-family:'Syne',sans-serif;font-size:12px;outline:none;transition:border-color .15s}
+.search-input:focus{border-color:var(--accent)}.search-input::placeholder{color:var(--text3)}
+.content{flex:1;overflow-y:auto;padding:20px}
+.content::-webkit-scrollbar{width:5px}.content::-webkit-scrollbar-thumb{background:var(--border2);border-radius:4px}
+/* cards grid */
+.cg{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:12px}
+.ct{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:16px;cursor:pointer;transition:all .2s;position:relative;min-height:120px;display:flex;flex-direction:column;animation:fi .2s ease both}
+.ct:hover{border-color:var(--border2);transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.3)}
+.ct-img{width:100%;height:75px;object-fit:cover;border-radius:7px;margin-bottom:10px}
+.cf{font-size:13px;font-weight:600;color:var(--text);line-height:1.5;flex:1;font-family:'Instrument Serif',serif}
+.cb{font-size:11px;color:var(--text2);line-height:1.5;margin-top:8px;padding-top:8px;border-top:1px solid var(--border);font-family:'DM Mono',monospace;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.cm{display:flex;align-items:center;gap:6px;margin-top:8px}
+.db{font-size:10px;font-family:'DM Mono',monospace;padding:2px 7px;border-radius:20px}
+.db.new{background:rgba(124,106,247,.15);color:var(--accent2)}.db.due{background:rgba(251,191,36,.15);color:var(--yellow)}.db.learned{background:rgba(74,222,128,.15);color:var(--green)}
+.xbtn{position:absolute;top:8px;right:8px;width:21px;height:21px;border-radius:50%;border:none;background:var(--surface3);color:var(--text3);font-size:11px;cursor:pointer;display:none;align-items:center;justify-content:center;transition:all .15s}
+.ct:hover .xbtn{display:flex}.xbtn:hover{background:rgba(248,113,113,.2);color:var(--red)}
+.ct.an{border-style:dashed;align-items:center;justify-content:center;color:var(--text3);font-size:13px;gap:5px}
+.ct.an:hover{color:var(--accent2);border-color:var(--accent)}
+/* decks home */
+.dg{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px}
+.dtile{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:18px;cursor:pointer;transition:all .2s;position:relative;overflow:hidden}
+.dtile:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.3)}
+.dtile::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--dc,var(--accent))}
+.dtile.an{border-style:dashed;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--text3);gap:6px;min-height:145px}
+.dtile.an:hover{color:var(--accent2);border-color:var(--accent)}
+/* study */
+.study-wrap{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:22px;padding:28px}
+.spbar{width:100%;max-width:580px;display:flex;align-items:center;gap:12px;font-size:11px;color:var(--text2);font-family:'DM Mono',monospace}
+.pb{flex:1;height:3px;background:var(--surface3);border-radius:2px;overflow:hidden}
+.pf{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:2px;transition:width .3s}
+.fc{width:100%;max-width:580px;min-height:280px;background:var(--surface);border:1px solid var(--border2);border-radius:20px;padding:32px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;position:relative;transition:all .3s;box-shadow:0 20px 60px rgba(0,0,0,.4)}
+.fc:hover{box-shadow:0 24px 80px rgba(0,0,0,.5)}.fc.flipped{background:var(--surface2)}
+.csl{position:absolute;top:14px;left:16px;font-size:9px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3);font-family:'DM Mono',monospace}
+.simg{max-width:100%;max-height:160px;object-fit:contain;border-radius:8px;margin-bottom:16px}
+.fq{font-family:'Instrument Serif',serif;font-size:22px;text-align:center;line-height:1.5}
+.fa{font-family:'DM Mono',monospace;font-size:13px;text-align:center;line-height:1.7;color:var(--text2);margin-top:16px;padding-top:16px;border-top:1px solid var(--border);width:100%}
+.fh{font-size:11px;color:var(--text3);font-family:'DM Mono',monospace}
+.rbrow{display:flex;gap:10px;width:100%;max-width:580px}
+.rb{flex:1;padding:12px;border-radius:var(--r2);border:1px solid var(--border);background:var(--surface);color:var(--text);font-family:'Syne',sans-serif;font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;text-align:center}
+.rb:hover{transform:translateY(-2px)}.rb.again{border-color:var(--red)}.rb.again:hover{background:rgba(248,113,113,.1);color:var(--red)}
+.rb.hard{border-color:var(--yellow)}.rb.hard:hover{background:rgba(251,191,36,.1);color:var(--yellow)}
+.rb.good{border-color:var(--green)}.rb.good:hover{background:rgba(74,222,128,.1);color:var(--green)}
+.rb.easy{border-color:var(--accent2)}.rb.easy:hover{background:var(--glow);color:var(--accent2)}
+.rsub{font-size:9px;font-weight:400;color:var(--text3);margin-top:2px;font-family:'DM Mono',monospace}
+/* modal */
+.mo{position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(8px);z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .2s}
+.mo.open{opacity:1;pointer-events:all}
+.modal{background:var(--surface);border:1px solid var(--border2);border-radius:18px;width:100%;max-width:560px;max-height:90vh;overflow-y:auto;box-shadow:0 40px 100px rgba(0,0,0,.6);transform:translateY(20px);transition:transform .2s}
+.mo.open .modal{transform:translateY(0)}
+.mh{display:flex;align-items:center;justify-content:space-between;padding:18px 20px 14px;border-bottom:1px solid var(--border)}
+.mt{font-size:16px;font-weight:700}
+.mx{width:26px;height:26px;border-radius:50%;border:none;background:var(--surface2);color:var(--text2);font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.mx:hover{background:var(--surface3);color:var(--text)}
+.mb{padding:18px 20px}
+.fg{margin-bottom:14px}
+.fl{display:block;font-size:11px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;color:var(--text3);margin-bottom:6px}
+.fi,.fta{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:var(--r3);padding:10px 12px;color:var(--text);font-family:'Syne',sans-serif;font-size:13px;outline:none;transition:border-color .15s}
+.fta{font-family:'DM Mono',monospace;font-size:12px;resize:vertical;min-height:85px;line-height:1.6}
+.fi:focus,.fta:focus{border-color:var(--accent)}
+.cr{display:flex;gap:7px;flex-wrap:wrap}
+.cdot{width:23px;height:23px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:all .15s}
+.cdot.sel{border-color:white;transform:scale(1.15)}
+.mf{padding:12px 20px 18px;border-top:1px solid var(--border);display:flex;gap:8px;justify-content:flex-end}
+.btn{padding:9px 17px;border-radius:var(--r3);border:1px solid var(--border);font-family:'Syne',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:all .15s}
+.bg{background:none;color:var(--text2)}.bg:hover{background:var(--surface2);color:var(--text)}
+.bp{background:var(--accent);border-color:var(--accent);color:white}.bp:hover{background:var(--accent2);box-shadow:0 4px 16px var(--glow)}
+/* image upload */
+.iua{border:2px dashed var(--border);border-radius:var(--r2);padding:18px;text-align:center;cursor:pointer;transition:all .15s;background:var(--surface2);position:relative}
+.iua:hover{border-color:var(--accent);background:var(--glow)}
+.ip{max-width:100%;max-height:130px;object-fit:contain;border-radius:6px;display:block;margin:8px auto 0}
+.irm{display:inline-flex;align-items:center;gap:4px;margin-top:7px;font-size:11px;color:var(--red);cursor:pointer;border:none;background:none;font-family:'Syne',sans-serif;font-weight:600;padding:3px 8px;border-radius:4px}
+.irm:hover{background:rgba(248,113,113,.1)}
+/* widget */
+#widget{display:none;position:fixed;bottom:24px;right:24px;width:310px;min-height:200px;background:var(--surface);border:1px solid var(--border2);border-radius:18px;box-shadow:0 24px 80px rgba(0,0,0,.7);z-index:5000;flex-direction:column;overflow:hidden}
+#widget.open{display:flex}
+.wh{display:flex;align-items:center;justify-content:space-between;padding:11px 13px 9px;background:linear-gradient(135deg,rgba(124,106,247,.15),rgba(192,132,252,.06));border-bottom:1px solid var(--border);cursor:move;user-select:none}
+.wlogo{font-size:12px;font-weight:800;background:linear-gradient(135deg,#fff,var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.wcb{width:20px;height:20px;border-radius:50%;border:none;background:var(--surface3);color:var(--text3);font-size:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.wcb:hover{background:var(--surface2);color:var(--text)}
+.wb{padding:12px;flex:1;overflow:hidden;display:flex;flex-direction:column;gap:8px}
+.wds{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:7px 10px;color:var(--text);font-family:'Syne',sans-serif;font-size:12px;outline:none;cursor:pointer}
+.wcard{background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:14px;cursor:pointer;min-height:90px;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:all .2s;position:relative}
+.wcard:hover{border-color:var(--border2)}.wcard.flipped{background:var(--surface3)}
+.wsl{position:absolute;top:7px;left:9px;font-size:9px;color:var(--text3);font-family:'DM Mono',monospace;letter-spacing:1px;text-transform:uppercase}
+.wimg{max-width:100%;max-height:55px;object-fit:contain;border-radius:5px;margin-bottom:7px}
+.wq{font-family:'Instrument Serif',serif;font-size:14px;text-align:center;line-height:1.5}
+.wa{font-family:'DM Mono',monospace;font-size:11px;color:var(--text2);text-align:center;line-height:1.6;margin-top:9px;padding-top:9px;border-top:1px solid var(--border);width:100%}
+.wfh{font-size:10px;color:var(--text3);font-family:'DM Mono',monospace;text-align:center;margin-top:6px}
+.wpb{display:flex;align-items:center;gap:8px;font-size:10px;color:var(--text3);font-family:'DM Mono',monospace}
+.wpbar{flex:1;height:2px;background:var(--surface3);border-radius:2px;overflow:hidden}
+.wpf{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:2px;transition:width .3s}
+.wrbrow{display:flex;gap:6px}
+.wrb{flex:1;padding:7px 3px;border-radius:7px;border:1px solid var(--border);background:none;color:var(--text2);font-family:'Syne',sans-serif;font-size:11px;font-weight:600;cursor:pointer;transition:all .15s;text-align:center}
+.wrb.again:hover{border-color:var(--red);color:var(--red);background:rgba(248,113,113,.1)}
+.wrb.hard:hover{border-color:var(--yellow);color:var(--yellow);background:rgba(251,191,36,.1)}
+.wrb.good:hover{border-color:var(--green);color:var(--green);background:rgba(74,222,128,.1)}
+.wrb.easy:hover{border-color:var(--accent2);color:var(--accent2);background:var(--glow)}
+.wdone{text-align:center;padding:10px;font-size:13px;color:var(--text2);display:flex;flex-direction:column;align-items:center;gap:8px}
+#widget-toggle{position:fixed;bottom:24px;right:24px;width:46px;height:46px;border-radius:50%;background:linear-gradient(135deg,var(--accent),#c084fc);border:none;color:white;font-size:18px;cursor:pointer;box-shadow:0 8px 24px rgba(124,106,247,.5);z-index:4999;transition:all .2s;display:flex;align-items:center;justify-content:center}
+#widget-toggle:hover{transform:scale(1.08)}.wthide{display:none!important}
+/* analytics */
+.ag{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:12px;margin-bottom:20px}
+.asc{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:18px;position:relative;overflow:hidden}
+.asc::after{content:attr(data-icon);position:absolute;right:14px;top:50%;transform:translateY(-50%);font-size:32px;opacity:.07}
+.asl{font-size:10px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;color:var(--text3);margin-bottom:7px;font-family:'DM Mono',monospace}
+.asn{font-size:30px;font-weight:800;line-height:1}
+.ass{font-size:11px;color:var(--text2);margin-top:4px;font-family:'DM Mono',monospace}
+.cw{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:18px;margin-bottom:12px}
+.cwt{font-size:13px;font-weight:700;margin-bottom:14px}
+.bc{display:flex;align-items:flex-end;gap:5px;height:90px}
+.bcol{display:flex;flex-direction:column;align-items:center;gap:3px;flex:1}
+.bar{width:100%;border-radius:4px 4px 0 0;transition:height .4s;min-height:2px}
+.blab{font-size:8px;color:var(--text3);font-family:'DM Mono',monospace;text-align:center}
+.bval{font-size:8px;color:var(--text2);font-family:'DM Mono',monospace}
+.hg{display:grid;grid-template-columns:repeat(26,1fr);gap:3px}
+.hc{aspect-ratio:1;border-radius:2px}
+.dpr{display:flex;align-items:center;gap:10px;padding:11px 0;border-bottom:1px solid var(--border)}
+.dpr:last-child{border-bottom:none}
+.dpn{font-size:13px;font-weight:600;width:110px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dpbar{flex:1;height:6px;background:var(--surface3);border-radius:3px;overflow:hidden}
+.dpf{height:100%;border-radius:3px;transition:width .4s}
+.dpp{font-size:11px;font-family:'DM Mono',monospace;color:var(--text2);width:32px;text-align:right}
+.dpcnt{font-size:11px;font-family:'DM Mono',monospace;color:var(--text3);width:48px;text-align:right}
+.streak-num{font-size:44px;font-weight:800;background:linear-gradient(135deg,var(--yellow),#fb923c);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1}
+/* sync */
+.sp{background:var(--surface2);border:1px solid var(--border);border-radius:var(--r2);padding:16px;margin-bottom:12px}
+.ss{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-family:'DM Mono',monospace;padding:3px 9px;border-radius:20px;margin-bottom:11px}
+.ss.con{background:rgba(74,222,128,.15);color:var(--green)}.ss.dis{background:rgba(248,113,113,.15);color:var(--red)}
+.sdot{width:5px;height:5px;border-radius:50%;background:currentColor}
+/* notif */
+.notif{position:fixed;bottom:20px;right:20px;background:var(--surface2);border:1px solid var(--border2);border-radius:var(--r2);padding:10px 15px;font-size:12px;font-weight:500;z-index:9000;transform:translateY(80px);opacity:0;transition:all .3s;box-shadow:0 8px 32px rgba(0,0,0,.4);max-width:270px}
+.notif.show{transform:translateY(0);opacity:1}.notif.success{border-color:var(--green);color:var(--green)}.notif.error{border-color:var(--red);color:var(--red)}.notif.info{border-color:var(--accent);color:var(--accent2)}
+/* complete */
+.csc{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:12px;text-align:center;padding:36px}
+.csc .ci{font-size:52px}.csc .ctt{font-size:24px;font-weight:800}.csc .cs2{font-size:13px;color:var(--text2);max-width:370px;line-height:1.6}
+.cst{display:flex;gap:14px;margin-top:8px;flex-wrap:wrap;justify-content:center}
+.cs{display:flex;flex-direction:column;align-items:center;gap:3px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--r2);padding:13px 18px}
+.csn{font-size:24px;font-weight:800}.csl2{font-size:10px;color:var(--text2);font-family:'DM Mono',monospace}
+.empty-s{display:flex;flex-direction:column;align-items:center;justify-content:center;height:240px;color:var(--text3);gap:9px;text-align:center}
+@keyframes fi{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.fade-in{animation:fi .25s ease forwards}
+@media(max-width:640px){.sidebar{width:196px;min-width:196px}.cg{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+<div class="app">
+<aside class="sidebar">
+  <div class="sidebar-header">
+    <div class="logo"><div class="logo-icon">⚡</div>Flashy</div>
+  </div>
+  <div class="deck-list">
+    <div class="sb-sec">Navigation</div>
+    <button class="sb-btn active" id="nb-home" onclick="showHome()"><span class="ic">🏠</span>All Decks</button>
+    <button class="sb-btn" id="nb-analytics" onclick="showAnalytics()"><span class="ic">📊</span>Analytics</button>
+    <button class="sb-btn" id="nb-sync" onclick="showSync()"><span class="ic">☁️</span>Sync & Export</button>
+    <div class="sb-sec" style="margin-top:5px">Your Decks</div>
+    <div id="sdlist"></div>
+  </div>
+  <div class="sb-footer">
+    <button class="fb" onclick="openNewDeckModal()">+ Deck</button>
+    <button class="fb p" onclick="openNewCardModal()">+ Card</button>
+    <button class="fb" style="flex:0;padding:8px 10px" onclick="toggleWidget()" title="Widget">⊞</button>
+  </div>
+</aside>
+<main class="main">
+  <div class="topbar">
+    <div class="topbar-title" id="ttitle">All Decks</div>
+    <div class="sw" id="sarea" style="display:none"><span class="si">🔍</span><input class="search-input" id="sinput" placeholder="Search cards..." oninput="filterCards()"></div>
+    <div id="tactions" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"></div>
+  </div>
+  <div class="content" id="content"></div>
+</main>
+</div>
+
+<!-- WIDGET -->
+<button id="widget-toggle" onclick="toggleWidget()" title="Widget Mode">⊞</button>
+<div id="widget">
+  <div class="wh" id="whandle">
+    <span class="wlogo">⚡ Flashy Widget</span>
+    <div style="display:flex;gap:5px">
+      <button class="wcb" onclick="document.getElementById('widget').classList.remove('open');document.getElementById('widget-toggle').classList.remove('wthide')">×</button>
+    </div>
+  </div>
+  <div class="wb">
+    <select class="wds" id="wdsel" onchange="initWidget()"></select>
+    <div id="wcontent"></div>
+  </div>
+</div>
+
+<!-- MODALS -->
+<div class="mo" id="mo-deck">
+  <div class="modal">
+    <div class="mh"><div class="mt" id="dmt">New Deck</div><button class="mx" onclick="closeModal('mo-deck')">×</button></div>
+    <div class="mb">
+      <div class="fg"><label class="fl">Deck Name</label><input class="fi" id="dn" placeholder="e.g. Cardiology, Pharmacology..."></div>
+      <div class="fg"><label class="fl">Emoji Icon</label><input class="fi" id="de" placeholder="🫀" maxlength="4"></div>
+      <div class="fg"><label class="fl">Color</label><div class="cr" id="cpicker"></div></div>
+    </div>
+    <div class="mf"><button class="btn bg" onclick="closeModal('mo-deck')">Cancel</button><button class="btn bp" onclick="saveDeck()">Create Deck</button></div>
+  </div>
+</div>
+
+<div class="mo" id="mo-card">
+  <div class="modal">
+    <div class="mh"><div class="mt" id="cmt">New Card</div><button class="mx" onclick="closeModal('mo-card')">×</button></div>
+    <div class="mb">
+      <div class="fg"><label class="fl">Deck</label><select class="fi" id="cdeck"></select></div>
+      <div class="fg"><label class="fl">Front (Question)</label><textarea class="fta" id="cfront" placeholder="What is the MOA of metformin?"></textarea></div>
+      <div class="fg">
+        <label class="fl">Front Image (optional)</label>
+        <div class="iua" onclick="document.getElementById('fimg-input').click()">
+          <input type="file" id="fimg-input" accept="image/*" style="display:none" onchange="handleImg('front',this)">
+          <div id="fimg-wrap"><div style="font-size:22px;margin-bottom:3px">🖼️</div><div style="font-size:11px;color:var(--text3)">Tap to add image</div></div>
+        </div>
+      </div>
+      <div class="fg"><label class="fl">Back (Answer)</label><textarea class="fta" id="cback" placeholder="Activates AMPK → inhibits hepatic gluconeogenesis..."></textarea></div>
+      <div class="fg">
+        <label class="fl">Back Image (optional)</label>
+        <div class="iua" onclick="document.getElementById('bimg-input').click()">
+          <input type="file" id="bimg-input" accept="image/*" style="display:none" onchange="handleImg('back',this)">
+          <div id="bimg-wrap"><div style="font-size:22px;margin-bottom:3px">🖼️</div><div style="font-size:11px;color:var(--text3)">Tap to add image</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="mf"><button class="btn bg" onclick="closeModal('mo-card')">Cancel</button><button class="btn bp" onclick="saveCard()">Save Card</button></div>
+  </div>
+</div>
+
+<div class="mo" id="mo-sync">
+  <div class="modal">
+    <div class="mh"><div class="mt">GitHub Gist Sync</div><button class="mx" onclick="closeModal('mo-sync')">×</button></div>
+    <div class="mb">
+      <p style="font-size:12px;color:var(--text2);margin-bottom:14px;line-height:1.6">Go to <code style="background:var(--surface3);padding:1px 5px;border-radius:3px;font-size:11px">github.com/settings/tokens</code> → New token → check <code style="background:var(--surface3);padding:1px 5px;border-radius:3px;font-size:11px">gist</code> scope only.</p>
+      <div class="fg"><label class="fl">GitHub Personal Access Token</label><input class="fi" id="gh-token" type="password" placeholder="ghp_xxxxxxxxxxxx"></div>
+      <div class="fg"><label class="fl">Gist ID (leave blank to auto-create)</label><input class="fi" id="gh-gist" placeholder="auto-created on first sync"></div>
+    </div>
+    <div class="mf"><button class="btn bg" onclick="closeModal('mo-sync')">Cancel</button><button class="btn bp" onclick="saveGH()">Connect & Sync</button></div>
+  </div>
+</div>
+
+<div class="notif" id="notif"></div>
+
+<script>
+// ═══════════════════════════════════
+// STATE
+// ═══════════════════════════════════
+const CLRS=['#7c6af7','#f472b6','#34d399','#fbbf24','#60a5fa','#f87171','#a78bfa','#2dd4bf','#fb923c','#e879f9'];
+let S={decks:[],cards:[],cur:null,view:'grid',editCard:null,editDeck:null,
+  sq:[],si:0,sf:false,ss:{again:0,hard:0,good:0,easy:0},
+  gh:{token:'',gist:''},history:[],
+  _fi:null,_bi:null,
+  wq:[],wi:0,wf:false,ws:{again:0,hard:0,good:0,easy:0}};
+
+function load(){
+  try{const sv=localStorage.getItem('flashy3');if(sv){const p=JSON.parse(sv);Object.assign(S,p);S._fi=null;S._bi=null;S.sq=[];S.si=0;S.sf=false;S.wq=[];S.wi=0;S.wf=false;}}catch(e){}
+  if(!S.decks||!S.decks.length)seed();
+  if(!S.history)S.history=[];
+}
+function persist(){
+  try{localStorage.setItem('flashy3',JSON.stringify({decks:S.decks,cards:S.cards,gh:S.gh,history:S.history}));}
+  catch(e){notify('Storage full — export a backup!','error');}
+}
+const uid=()=>Math.random().toString(36).slice(2,9)+Date.now().toString(36);
+
+function seed(){
+  const d1={id:uid(),name:'Cardiology',emoji:'🫀',color:'#f472b6'};
+  const d2={id:uid(),name:'Pharmacology',emoji:'💊',color:'#34d399'};
+  const d3={id:uid(),name:'Neurology',emoji:'🧠',color:'#7c6af7'};
+  const d4={id:uid(),name:'Gynaecology',emoji:'🩺',color:'#fbbf24'};
+  S.decks=[d1,d2,d3,d4];
+  S.cards=[
+    mk(d1,'Most common cause of mitral stenosis?','Rheumatic fever / Rheumatic heart disease'),
+    mk(d1,'Murmur of MS — timing & character?','Low-pitched mid-diastolic rumble at apex. Presystolic accentuation in sinus rhythm.','learned',3),
+    mk(d1,'Shorter A2-OS interval in MS means?','More severe stenosis (higher LA pressure → earlier valve opening)'),
+    mk(d2,'DOC for WPW with AF?','Procainamide IV. CCBs/digoxin/adenosine are CONTRAINDICATED.','due',1),
+    mk(d2,'MOA of Metformin?','Activates AMPK → inhibits hepatic gluconeogenesis. Does NOT cause hypoglycemia.'),
+    mk(d3,'NPH Triad?','Wet + Wacky + Wobbly\nUrinary incontinence + Dementia + Gait apraxia'),
+    mk(d4,'GnRH analogue uses?','Pulsatile → ↑LH, ↑FSH, ↑E\n1. Delayed puberty\n2. Kallmann syndrome\n3. Anovulation'),
+    mk(d4,'GnRH antagonist uses?','Continuous → ↓LH, ↓FSH, ↓E\n1. Precocious puberty 2. Fibroid 3. Endometriosis\n4. ER+ve breast cancer 5. Hirsutism 6. Prostate cancer'),
+  ];
+  // demo history
+  const now=Date.now();const ra=['again','hard','good','easy','good','good','easy'];
+  for(let i=7;i>=0;i--){S.cards.slice(0,3+Math.floor(Math.random()*3)).forEach(c=>{S.history.push({date:now-i*86400000,cardId:c.id,deckId:c.deckId,rating:ra[Math.floor(Math.random()*ra.length)]});});}
+  persist();
+}
+function mk(deck,front,back,status='new',interval=0){
+  return{id:uid(),deckId:deck.id,front,back,status,interval,due:Date.now()+(interval*86400000),frontImg:null,backImg:null};
+}
+
+// ═══════════════════════════════════
+// SIDEBAR
+// ═══════════════════════════════════
+function renderSB(){
+  document.getElementById('sdlist').innerHTML=S.decks.map(d=>{
+    const n=S.cards.filter(c=>c.deckId===d.id).length;
+    return`<div class="di ${S.cur?.id===d.id?'active':''}" onclick="openDeck('${d.id}')"><span style="font-size:13px">${d.emoji||'📦'}</span><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${d.name}</span><span class="dc">${n}</span></div>`;
+  }).join('');
+}
+function setNav(id){document.querySelectorAll('.sb-btn').forEach(b=>b.classList.remove('active'));document.querySelectorAll('.di').forEach(d=>d.classList.remove('active'));if(id)document.getElementById(id)?.classList.add('active');}
+
+// ═══════════════════════════════════
+// HOME
+// ═══════════════════════════════════
+function showHome(){
+  S.cur=null;setNav('nb-home');
+  document.getElementById('ttitle').textContent='All Decks';
+  document.getElementById('sarea').style.display='none';
+  document.getElementById('tactions').innerHTML=`<button class="tb-btn a" onclick="openNewDeckModal()">+ New Deck</button>`;
+  const due=S.cards.filter(c=>c.status==='due'||c.status==='new').length;
+  let html='';
+  if(due>0)html+=`<div style="margin-bottom:16px;padding:13px 16px;background:linear-gradient(135deg,rgba(124,106,247,.12),rgba(192,132,252,.05));border:1px solid rgba(124,106,247,.25);border-radius:var(--r);display:flex;align-items:center;gap:12px"><div style="font-size:24px">⚡</div><div><div style="font-size:14px;font-weight:700;margin-bottom:2px">${due} cards ready to study</div><div style="font-size:12px;color:var(--text2)">Keep your streak going</div></div><button class="tb-btn a" style="margin-left:auto" onclick="studyAll()">Study All</button></div>`;
+  html+=`<div class="dg">`;
+  html+=S.decks.map(d=>{
+    const cs=S.cards.filter(c=>c.deckId===d.id);
+    const nw=cs.filter(c=>c.status==='new').length,du=cs.filter(c=>c.status==='due').length,lr=cs.filter(c=>c.status==='learned').length;
+    return`<div class="dtile" style="--dc:${d.color}" onclick="openDeck('${d.id}')">
+      <div style="font-size:24px;margin-bottom:9px">${d.emoji||'📦'}</div>
+      <div style="font-size:14px;font-weight:700;margin-bottom:2px">${d.name}</div>
+      <div style="font-size:11px;color:var(--text3);font-family:'DM Mono',monospace">${cs.length} card${cs.length!==1?'s':''}</div>
+      <div style="display:flex;gap:7px;margin-top:11px;flex-wrap:wrap">
+        ${nw?`<span style="font-size:10px;font-family:'DM Mono',monospace;padding:2px 7px;border-radius:20px;background:rgba(124,106,247,.12);color:var(--accent2)">${nw} new</span>`:''}
+        ${du?`<span style="font-size:10px;font-family:'DM Mono',monospace;padding:2px 7px;border-radius:20px;background:rgba(251,191,36,.12);color:var(--yellow)">${du} due</span>`:''}
+        ${lr?`<span style="font-size:10px;font-family:'DM Mono',monospace;padding:2px 7px;border-radius:20px;background:rgba(74,222,128,.12);color:var(--green)">${lr} done</span>`:''}
+      </div>
+    </div>`;
+  }).join('');
+  html+=`<div class="dtile an" onclick="openNewDeckModal()"><div style="font-size:24px;opacity:.4">+</div><div style="font-size:13px;font-weight:600">New Deck</div></div></div>`;
+  document.getElementById('content').innerHTML=html;
+  renderSB();
+}
+
+function openDeck(id){
+  S.cur=S.decks.find(d=>d.id===id);if(!S.cur)return;
+  setNav(null);
+  document.getElementById('ttitle').textContent=`${S.cur.emoji} ${S.cur.name}`;
+  document.getElementById('sarea').style.display='flex';
+  document.getElementById('sinput').value='';
+  document.getElementById('tactions').innerHTML=`
+    <div class="vtog"><button class="vb ${S.view==='grid'?'active':''}" onclick="setView('grid')">⊞</button><button class="vb ${S.view==='list'?'active':''}" onclick="setView('list')">☰</button></div>
+    <button class="tb-btn" onclick="studyDeck('${id}')">⚡ Cram</button>
+    <button class="tb-btn a" onclick="openNewCardModal('${id}')">+ Card</button>`;
+  renderSB();renderCards();
+}
+function setView(v){S.view=v;if(S.cur)openDeck(S.cur.id);}
+function filterCards(){renderCards(document.getElementById('sinput').value);}
+
+function badge(c){
+  if(c.status==='new')return'<span class="db new">New</span>';
+  if(c.status==='due')return'<span class="db due">Due</span>';
+  return'<span class="db learned">Learned</span>';
+}
+
+function renderCards(q=''){
+  let cs=S.cards.filter(c=>c.deckId===S.cur?.id);
+  if(q){const ql=q.toLowerCase();cs=cs.filter(c=>c.front.toLowerCase().includes(ql)||c.back.toLowerCase().includes(ql));}
+  const el=document.getElementById('content');
+  if(S.view==='grid'){
+    let h=`<div class="cg">`;
+    h+=cs.map(c=>`<div class="ct" onclick="editCard('${c.id}')">
+      <button class="xbtn" onclick="event.stopPropagation();delCard('${c.id}')">×</button>
+      ${c.frontImg?`<img class="ct-img" src="${c.frontImg}" alt="">`:''}
+      <div class="cf">${esc(c.front)}</div>
+      <div class="cb">${esc(c.back)}</div>
+      <div class="cm">${badge(c)}</div>
+    </div>`).join('');
+    h+=`<div class="ct an" onclick="openNewCardModal('${S.cur.id}')"><div style="font-size:20px">+</div><div>New Card</div></div></div>`;
+    el.innerHTML=h;
+  }else{
+    let h=`<div style="display:flex;flex-direction:column;gap:6px">`;
+    h+=cs.map(c=>{
+      const im=c.frontImg?`<img style="width:34px;height:34px;object-fit:cover;border-radius:5px;flex-shrink:0" src="${c.frontImg}" alt="">`:'';
+      return`<div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r2);padding:13px 15px;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:12px" onclick="editCard('${c.id}')" onmouseover="this.style.borderColor='var(--border2)'" onmouseout="this.style.borderColor='var(--border)'">
+        ${im}<div style="flex:1;min-width:0"><div style="font-family:'Instrument Serif',serif;font-size:13px;margin-bottom:3px">${esc(c.front)}</div><div style="font-size:11px;color:var(--text2);font-family:'DM Mono',monospace;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(c.back)}</div></div>
+        <div style="display:flex;align-items:center;gap:7px;flex-shrink:0">${badge(c)}<button style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:14px;padding:3px" onclick="event.stopPropagation();delCard('${c.id}')">×</button></div>
+      </div>`;
+    }).join('');
+    h+=`<div style="background:var(--surface);border:1px dashed var(--border);border-radius:var(--r2);padding:13px 15px;cursor:pointer;text-align:center;color:var(--text3);font-size:12px;transition:all .15s" onclick="openNewCardModal('${S.cur.id}')" onmouseover="this.style.color='var(--accent2)';this.style.borderColor='var(--accent)'" onmouseout="this.style.color='var(--text3)';this.style.borderColor='var(--border)'">+ New Card</div></div>`;
+    el.innerHTML=h;
+  }
+  if(!cs.length&&!q)el.innerHTML+=`<div class="empty-s"><div style="font-size:40px;opacity:.4">🗃️</div><div style="font-size:14px;font-weight:600;color:var(--text2)">No cards yet</div><div style="font-size:12px">Add your first card above</div></div>`;
+}
+
+// ═══════════════════════════════════
+// STUDY
+// ═══════════════════════════════════
+function studyDeck(id){startStudy(S.cards.filter(c=>c.deckId===id&&(c.status==='new'||c.status==='due')));}
+function studyAll(){startStudy(S.cards.filter(c=>c.status==='new'||c.status==='due'));}
+function startStudy(q){
+  if(!q.length){notify('No cards due! 🎉','success');return;}
+  S.sq=shuf([...q]);S.si=0;S.sf=false;S.ss={again:0,hard:0,good:0,easy:0};S.cur=null;
+  renderSB();
+  document.getElementById('ttitle').textContent='Study Session';
+  document.getElementById('sarea').style.display='none';
+  document.getElementById('tactions').innerHTML=`<button class="tb-btn" onclick="showHome()">✕ End</button>`;
+  renderStudy();
+}
+function renderStudy(){
+  if(S.si>=S.sq.length){renderDone();return;}
+  const c=S.sq[S.si],tot=S.sq.length,pct=Math.round((S.si/tot)*100);
+  const fi=c.frontImg?`<img class="simg" src="${c.frontImg}" alt="">`:'';
+  const bi=c.backImg?`<img class="simg" src="${c.backImg}" alt="" style="margin-top:12px">`:'';
+  document.getElementById('content').innerHTML=`<div class="study-wrap fade-in">
+    <div class="spbar"><span>${S.si+1}/${tot}</span><div class="pb"><div class="pf" style="width:${pct}%"></div></div><span>${pct}%</span></div>
+    <div class="fc ${S.sf?'flipped':''}" onclick="flipStudy()">
+      <div class="csl">${S.sf?'Back':'Front'}</div>
+      ${fi}<div class="fq">${esc(c.front)}</div>
+      ${S.sf?`<div class="fa">${esc(c.back)}${bi}</div>`:''}
+    </div>
+    ${S.sf?`<div class="rbrow">
+      <button class="rb again" onclick="rate('again')">Again<div class="rsub">&lt;1min</div></button>
+      <button class="rb hard" onclick="rate('hard')">Hard<div class="rsub">1 day</div></button>
+      <button class="rb good" onclick="rate('good')">Good<div class="rsub">3 days</div></button>
+      <button class="rb easy" onclick="rate('easy')">Easy<div class="rsub">1 week</div></button>
+    </div>`:`<div class="fh">Tap card or press Space to reveal</div>`}
+  </div>`;
+}
+function flipStudy(){S.sf=!S.sf;renderStudy();}
+function rate(r){
+  const c=S.sq[S.si];S.ss[r]++;
+  const iv={again:0,hard:1,good:3,easy:7};const ni=iv[r];
+  const i=S.cards.findIndex(x=>x.id===c.id);
+  if(i!==-1){S.cards[i].interval=ni;S.cards[i].status=ni===0?'due':'learned';S.cards[i].due=Date.now()+ni*86400000;}
+  S.history.push({date:Date.now(),cardId:c.id,deckId:c.deckId,rating:r});
+  if(r==='again')S.sq.push(c);S.si++;S.sf=false;persist();renderStudy();
+}
+function renderDone(){
+  const s=S.ss,tot=s.again+s.hard+s.good+s.easy;
+  document.getElementById('content').innerHTML=`<div class="csc fade-in"><div class="ci">🎉</div><div class="ctt">Session Complete!</div><div class="cs2">You reviewed ${tot} cards. NEET PG gets cracked one session at a time.</div><div class="cst"><div class="cs"><div class="csn" style="color:var(--red)">${s.again}</div><div class="csl2">Again</div></div><div class="cs"><div class="csn" style="color:var(--yellow)">${s.hard}</div><div class="csl2">Hard</div></div><div class="cs"><div class="csn" style="color:var(--green)">${s.good}</div><div class="csl2">Good</div></div><div class="cs"><div class="csn" style="color:var(--accent2)">${s.easy}</div><div class="csl2">Easy</div></div></div><button class="btn bp" style="margin-top:8px" onclick="showHome()">Back to Decks</button></div>`;
+}
+
+// ═══════════════════════════════════
+// ANALYTICS
+// ═══════════════════════════════════
+function dstr(ts){const d=new Date(ts);return`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;}
+function calcStreak(){
+  if(!S.history.length)return 0;
+  const days=new Set(S.history.map(h=>dstr(h.date)));
+  let streak=0;const now=Date.now();
+  for(let i=0;i<365;i++){if(days.has(dstr(now-i*86400000)))streak++;else if(i>0)break;}
+  return streak;
+}
+function showAnalytics(){
+  S.cur=null;setNav('nb-analytics');
+  document.getElementById('ttitle').textContent='Analytics';
+  document.getElementById('sarea').style.display='none';
+  document.getElementById('tactions').innerHTML='';
+  renderSB();
+  const now=Date.now(),today=dstr(now);
+  const totalRev=S.history.length;
+  const todayRev=S.history.filter(h=>dstr(h.date)===today).length;
+  const totalCards=S.cards.length;
+  const learned=S.cards.filter(c=>c.status==='learned').length;
+  const streak=calcStreak();
+  const good=S.history.filter(h=>h.rating==='good'||h.rating==='easy').length;
+  const retention=totalRev>0?Math.round((good/totalRev)*100):0;
+  // 14-day
+  const days14=[];for(let i=13;i>=0;i--){const d=new Date(now-i*86400000);days14.push({label:d.toLocaleDateString('en',{weekday:'narrow',day:'numeric'}),date:dstr(now-i*86400000),count:0});}
+  S.history.forEach(h=>{const f=days14.find(x=>x.date===dstr(h.date));if(f)f.count++;});
+  const mx14=Math.max(...days14.map(d=>d.count),1);
+  // ratings
+  const rc={again:0,hard:0,good:0,easy:0};S.history.forEach(h=>{if(rc[h.rating]!==undefined)rc[h.rating]++;});
+  // heatmap 182 days
+  const heat=[];for(let i=181;i>=0;i--){const d=dstr(now-i*86400000);heat.push({date:d,cnt:S.history.filter(h=>dstr(h.date)===d).length});}
+  const mxh=Math.max(...heat.map(h=>h.cnt),1);
+  // deck breakdown
+  const db=S.decks.map(d=>{const cs=S.cards.filter(c=>c.deckId===d.id);const lr=cs.filter(c=>c.status==='learned').length;return{...d,total:cs.length,learned:lr,pct:cs.length>0?Math.round((lr/cs.length)*100):0};});
+
+  document.getElementById('content').innerHTML=`<div class="fade-in">
+    <div class="ag">
+      <div class="asc" data-icon="🔥"><div class="asl">Current Streak</div><div style="display:flex;align-items:baseline;gap:6px"><div class="streak-num">${streak}</div><div style="font-size:13px;color:var(--text2);margin-top:6px">days</div></div></div>
+      <div class="asc" data-icon="⚡"><div class="asl">Reviewed Today</div><div class="asn" style="color:var(--accent2)">${todayRev}</div><div class="ass">${totalRev} all time</div></div>
+      <div class="asc" data-icon="✅"><div class="asl">Cards Mastered</div><div class="asn" style="color:var(--green)">${learned}</div><div class="ass">of ${totalCards} total</div></div>
+      <div class="asc" data-icon="🎯"><div class="asl">Retention Rate</div><div class="asn" style="color:var(--yellow)">${retention}%</div><div class="ass">good + easy answers</div></div>
+    </div>
+    <div class="cw"><div class="cwt">📅 Daily Reviews — Last 14 Days</div><div class="bc">${days14.map(d=>{const h=Math.max(3,Math.round((d.count/mx14)*82));return`<div class="bcol"><div class="bval">${d.count||''}</div><div class="bar" style="height:${h}px;background:${d.date===today?'var(--accent)':'var(--surface3)'}"></div><div class="blab">${d.label}</div></div>`;}).join('')}</div></div>
+    <div class="cw"><div class="cwt">📊 Rating Distribution</div><div class="bc" style="height:80px">${[['again',rc.again,'var(--red)'],['hard',rc.hard,'var(--yellow)'],['good',rc.good,'var(--green)'],['easy',rc.easy,'var(--accent2)']].map(([l,n,col])=>{const tot=Math.max(Object.values(rc).reduce((a,b)=>a+b,0),1);const h=Math.max(3,Math.round((n/tot)*70));return`<div class="bcol"><div class="bval" style="color:${col}">${n}</div><div class="bar" style="height:${h}px;background:${col};opacity:.75"></div><div class="blab">${l}</div></div>`;}).join('')}</div></div>
+    <div class="cw"><div class="cwt">🗓️ Activity Heatmap — Last 6 Months</div><div class="hg">${heat.map(h=>{const a=h.cnt===0?0:Math.max(0.1,Math.min(1,h.cnt/mxh));const c=h.cnt===0?'var(--surface3)':`rgba(124,106,247,${a})`;return`<div class="hc" style="background:${c}" title="${h.date}: ${h.cnt} reviews"></div>`;}).join('')}</div><div style="display:flex;gap:12px;margin-top:10px;flex-wrap:wrap">${[['var(--surface3)','0'],['rgba(124,106,247,.2)','low'],['rgba(124,106,247,.55)','mid'],['var(--accent)','high']].map(([c,l])=>`<div style="display:flex;align-items:center;gap:5px;font-size:10px;color:var(--text2);font-family:'DM Mono',monospace"><div style="width:8px;height:8px;border-radius:2px;background:${c}"></div>${l}</div>`).join('')}</div></div>
+    <div class="cw"><div class="cwt">📚 Deck Progress</div>${db.map(d=>`<div class="dpr"><div style="font-size:15px;flex-shrink:0">${d.emoji}</div><div class="dpn">${d.name}</div><div class="dpbar"><div class="dpf" style="width:${d.pct}%;background:${d.color}"></div></div><div class="dpp">${d.pct}%</div><div class="dpcnt">${d.learned}/${d.total}</div></div>`).join('')}</div>
+  </div>`;
+}
+
+// ═══════════════════════════════════
+// WIDGET
+// ═══════════════════════════════════
+function toggleWidget(){
+  const w=document.getElementById('widget'),btn=document.getElementById('widget-toggle');
+  if(w.classList.contains('open')){w.classList.remove('open');btn.classList.remove('wthide');}
+  else{w.classList.add('open');btn.classList.add('wthide');populateWDeck();initWidget();}
+}
+function populateWDeck(){
+  document.getElementById('wdsel').innerHTML=`<option value="">All decks</option>`+S.decks.map(d=>`<option value="${d.id}">${d.emoji} ${d.name}</option>`).join('');
+}
+function initWidget(){
+  const did=document.getElementById('wdsel').value;
+  let q=S.cards.filter(c=>c.status==='new'||c.status==='due');
+  if(did)q=q.filter(c=>c.deckId===did);
+  S.wq=shuf([...q]);S.wi=0;S.wf=false;S.ws={again:0,hard:0,good:0,easy:0};renderWidget();
+}
+function renderWidget(){
+  const el=document.getElementById('wcontent');
+  if(S.wi>=S.wq.length){
+    const s=S.ws,tot=s.again+s.hard+s.good+s.easy;
+    el.innerHTML=`<div class="wdone"><div style="font-size:28px">🎉</div><div style="font-weight:700;font-size:13px">Done! ${tot} reviewed</div><div style="display:flex;gap:10px;font-family:'DM Mono',monospace;font-size:11px"><span style="color:var(--red)">${s.again}</span><span style="color:var(--yellow)">${s.hard}</span><span style="color:var(--green)">${s.good}</span><span style="color:var(--accent2)">${s.easy}</span></div><button class="btn bp" style="font-size:11px;padding:6px 14px" onclick="initWidget()">Restart</button></div>`;return;
+  }
+  const c=S.wq[S.wi],tot=S.wq.length,pct=Math.round((S.wi/tot)*100);
+  const fi=c.frontImg?`<img class="wimg" src="${c.frontImg}" alt="">`:'';
+  const bi=c.backImg?`<img class="wimg" src="${c.backImg}" alt="" style="margin-top:6px">`:'';
+  el.innerHTML=`<div class="wpb"><span>${S.wi+1}/${tot}</span><div class="wpbar"><div class="wpf" style="width:${pct}%"></div></div></div>
+    <div class="wcard ${S.wf?'flipped':''}" onclick="wFlip()">
+      <div class="wsl">${S.wf?'back':'front'}</div>
+      ${fi}<div class="wq">${esc(c.front)}</div>
+      ${S.wf?`<div class="wa">${esc(c.back)}${bi}</div>`:'<div class="wfh">tap to reveal</div>'}
+    </div>
+    ${S.wf?`<div class="wrbrow"><button class="wrb again" onclick="wRate('again')">Again</button><button class="wrb hard" onclick="wRate('hard')">Hard</button><button class="wrb good" onclick="wRate('good')">Good</button><button class="wrb easy" onclick="wRate('easy')">Easy</button></div>`:''}`;
+}
+function wFlip(){S.wf=!S.wf;renderWidget();}
+function wRate(r){
+  const c=S.wq[S.wi];S.ws[r]++;
+  const iv={again:0,hard:1,good:3,easy:7};const ni=iv[r];
+  const i=S.cards.findIndex(x=>x.id===c.id);
+  if(i!==-1){S.cards[i].interval=ni;S.cards[i].status=ni===0?'due':'learned';S.cards[i].due=Date.now()+ni*86400000;}
+  S.history.push({date:Date.now(),cardId:c.id,deckId:c.deckId,rating:r});
+  if(r==='again')S.wq.push(c);S.wi++;S.wf=false;persist();renderWidget();
+}
+// Draggable widget
+(function(){
+  const w=document.getElementById('widget'),h=document.getElementById('whandle');
+  let dr=false,ox=0,oy=0;
+  h.addEventListener('mousedown',e=>{dr=true;w.style.right='auto';w.style.bottom='auto';ox=e.clientX-w.offsetLeft;oy=e.clientY-w.offsetTop;});
+  document.addEventListener('mousemove',e=>{if(!dr)return;w.style.left=(e.clientX-ox)+'px';w.style.top=(e.clientY-oy)+'px';});
+  document.addEventListener('mouseup',()=>dr=false);
+  h.addEventListener('touchstart',e=>{dr=true;w.style.right='auto';w.style.bottom='auto';const t=e.touches[0];ox=t.clientX-w.offsetLeft;oy=t.clientY-w.offsetTop;},{passive:true});
+  document.addEventListener('touchmove',e=>{if(!dr)return;const t=e.touches[0];w.style.left=(t.clientX-ox)+'px';w.style.top=(t.clientY-oy)+'px';},{passive:true});
+  document.addEventListener('touchend',()=>dr=false);
+})();
+
+// ═══════════════════════════════════
+// SYNC
+// ═══════════════════════════════════
+function showSync(){
+  S.cur=null;setNav('nb-sync');
+  document.getElementById('ttitle').textContent='Sync & Export';
+  document.getElementById('sarea').style.display='none';
+  document.getElementById('tactions').innerHTML='';
+  renderSB();
+  const con=!!S.gh.token;
+  document.getElementById('content').innerHTML=`<div class="fade-in" style="max-width:560px">
+    <div class="sp"><div style="font-size:14px;font-weight:700;margin-bottom:4px">☁️ GitHub Gist Sync</div><div style="font-size:12px;color:var(--text2);margin-bottom:11px;line-height:1.6">Back up all cards + analytics history across devices. Free forever.</div><div class="ss ${con?'con':'dis'}"><span class="sdot"></span>${con?`Connected · ${S.gh.gist||'auto'}`:'Not connected'}</div><div style="display:flex;gap:7px;flex-wrap:wrap"><button class="btn bp" onclick="openModal('mo-sync')">${con?'⚙️ Config':'🔗 Connect'}</button>${con?`<button class="btn bg" onclick="syncPush()">↑ Push</button><button class="btn bg" onclick="syncPull()">↓ Pull</button>`:''}</div></div>
+    <div class="sp"><div style="font-size:14px;font-weight:700;margin-bottom:4px">📤 Export</div><div style="display:flex;gap:7px;flex-wrap:wrap;margin-top:10px"><button class="btn bg" onclick="exportJSON()">JSON backup</button><button class="btn bg" onclick="exportCSV()">CSV for Anki</button></div></div>
+    <div class="sp"><div style="font-size:14px;font-weight:700;margin-bottom:4px">📥 Import</div><div style="display:flex;gap:7px;flex-wrap:wrap;margin-top:10px"><label class="btn bg" style="cursor:pointer">Import JSON<input type="file" accept=".json" style="display:none" onchange="importJSON(this)"></label><label class="btn bg" style="cursor:pointer">Import CSV<input type="file" accept=".csv,.txt" style="display:none" onchange="importCSV(this)"></label></div></div>
+    <div style="padding:11px 15px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--r2);font-size:11px;color:var(--text2);line-height:1.7"><strong style="color:var(--text)">💡 Anki import:</strong> File → Import → Field 1 = Front, Field 2 = Back. Images are preserved in JSON backup only.</div>
+  </div>`;
+}
+function saveGH(){
+  const t=document.getElementById('gh-token').value.trim(),g=document.getElementById('gh-gist').value.trim();
+  if(!t){notify('Enter a token','error');return;}
+  S.gh.token=t;S.gh.gist=g;persist();closeModal('mo-sync');notify('Connected! Pushing...','info');setTimeout(syncPush,500);
+}
+async function syncPush(){
+  if(!S.gh.token){notify('Connect first','error');return;}
+  notify('Syncing...','info');
+  try{
+    const data=JSON.stringify({decks:S.decks,cards:S.cards,history:S.history},null,2);
+    const body={description:'Flashy data',public:false,files:{'flashy_data.json':{content:data}}};
+    const url=S.gh.gist?`https://api.github.com/gists/${S.gh.gist}`:'https://api.github.com/gists';
+    const r=await fetch(url,{method:S.gh.gist?'PATCH':'POST',headers:{Authorization:`token ${S.gh.token}`,'Content-Type':'application/json'},body:JSON.stringify(body)});
+    const j=await r.json();
+    if(j.id){S.gh.gist=j.id;persist();notify('Synced ✓','success');if(document.getElementById('ttitle').textContent==='Sync & Export')showSync();}
+    else notify('Fail: '+(j.message||'?'),'error');
+  }catch(e){notify('Error: '+e.message,'error');}
+}
+async function syncPull(){
+  if(!S.gh.token||!S.gh.gist){notify('Push first','error');return;}
+  notify('Pulling...','info');
+  try{
+    const r=await fetch(`https://api.github.com/gists/${S.gh.gist}`,{headers:{Authorization:`token ${S.gh.token}`}});
+    const j=await r.json();const raw=j.files?.['flashy_data.json']?.content;
+    if(!raw){notify('No data','error');return;}
+    const p=JSON.parse(raw);S.decks=p.decks||[];S.cards=p.cards||[];S.history=p.history||[];persist();notify('Pulled ✓','success');showSync();
+  }catch(e){notify('Error: '+e.message,'error');}
+}
+function exportJSON(){download('flashy_backup.json',JSON.stringify({decks:S.decks,cards:S.cards,history:S.history},null,2),'application/json');notify('Exported ✓','success');}
+function exportCSV(){
+  const rows=['Front,Back,Deck,Status'];
+  S.cards.forEach(c=>{const d=S.decks.find(x=>x.id===c.deckId)?.name||'';rows.push(`"${escq(c.front)}","${escq(c.back)}","${d}","${c.status}"`);}); 
+  download('flashy_anki.csv',rows.join('\n'),'text/csv');notify('CSV exported ✓','success');
+}
+function importJSON(inp){
+  const f=inp.files[0];if(!f)return;const r=new FileReader();
+  r.onload=e=>{try{const p=JSON.parse(e.target.result);if(p.decks&&p.cards){S.decks=p.decks;S.cards=p.cards;S.history=p.history||[];persist();notify(`Imported ${S.decks.length} decks, ${S.cards.length} cards ✓`,'success');showHome();}else notify('Bad format','error');}catch{notify('Parse error','error');}};r.readAsText(f);
+}
+function importCSV(inp){
+  const f=inp.files[0];if(!f)return;const r=new FileReader();
+  r.onload=e=>{
+    const lines=e.target.result.split('\n').filter(l=>l.trim());
+    const start=lines[0].toLowerCase().includes('front')?1:0;
+    let deck=S.decks[0];if(!deck){deck={id:uid(),name:'Imported',emoji:'📥',color:'#7c6af7'};S.decks.push(deck);}
+    let cnt=0;lines.slice(start).forEach(line=>{const p=parseCSVLine(line);if(p.length>=2&&p[0]&&p[1]){S.cards.push({id:uid(),deckId:deck.id,front:p[0],back:p[1],status:'new',interval:0,due:Date.now(),frontImg:null,backImg:null});cnt++;}});
+    persist();notify(`Imported ${cnt} cards ✓`,'success');showHome();
+  };r.readAsText(f);
+}
+function parseCSVLine(l){const r=[];let cur='';let q=false;for(const ch of l){if(ch==='"')q=!q;else if(ch===','&&!q){r.push(cur.trim());cur='';}else cur+=ch;}r.push(cur.trim());return r;}
+
+// ═══════════════════════════════════
+// MODALS / CARDS
+// ═══════════════════════════════════
+function openNewDeckModal(){S.editDeck=null;document.getElementById('dmt').textContent='New Deck';document.getElementById('dn').value='';document.getElementById('de').value='';renderCPicker(CLRS[0]);openModal('mo-deck');}
+function renderCPicker(sel){document.getElementById('cpicker').innerHTML=CLRS.map(c=>`<div class="cdot ${c===sel?'sel':''}" style="background:${c}" onclick="selColor('${c}')"></div>`).join('');}
+function selColor(c){renderCPicker(c);}
+function saveDeck(){
+  const n=document.getElementById('dn').value.trim();if(!n){notify('Enter a name','error');return;}
+  const e=document.getElementById('de').value.trim()||'📦';
+  const sel=document.querySelector('.cdot.sel');const c=sel?sel.style.background:CLRS[0];
+  if(S.editDeck){const i=S.decks.findIndex(d=>d.id===S.editDeck);if(i!==-1){S.decks[i].name=n;S.decks[i].emoji=e;S.decks[i].color=c;}}
+  else S.decks.push({id:uid(),name:n,emoji:e,color:c});
+  persist();closeModal('mo-deck');showHome();
+}
+function openNewCardModal(did){
+  S.editCard=null;S._fi=null;S._bi=null;
+  document.getElementById('cmt').textContent='New Card';
+  document.getElementById('cfront').value='';document.getElementById('cback').value='';
+  resetIPrev('f');resetIPrev('b');
+  popDeckSel(did||S.cur?.id);openModal('mo-card');
+}
+function editCard(id){
+  const c=S.cards.find(x=>x.id===id);if(!c)return;
+  S.editCard=id;S._fi=c.frontImg||null;S._bi=c.backImg||null;
+  document.getElementById('cmt').textContent='Edit Card';
+  document.getElementById('cfront').value=c.front;document.getElementById('cback').value=c.back;
+  popDeckSel(c.deckId);
+  if(c.frontImg)showIPrev('f',c.frontImg);else resetIPrev('f');
+  if(c.backImg)showIPrev('b',c.backImg);else resetIPrev('b');
+  openModal('mo-card');
+}
+function handleImg(side,inp){
+  const f=inp.files[0];if(!f)return;const r=new FileReader();
+  r.onload=e=>{if(side==='front')S._fi=e.target.result;else S._bi=e.target.result;showIPrev(side==='front'?'f':'b',e.target.result);};r.readAsDataURL(f);
+}
+function showIPrev(s,src){document.getElementById(`${s}img-wrap`).innerHTML=`<img class="ip" src="${src}" alt=""><button class="irm" onclick="clearImg('${s}')">× Remove</button>`;}
+function resetIPrev(s){document.getElementById(`${s}img-wrap`).innerHTML=`<div style="font-size:22px;margin-bottom:3px">🖼️</div><div style="font-size:11px;color:var(--text3)">Tap to add image</div>`;document.getElementById(`${s}img-input`).value='';}
+function clearImg(s){if(s==='f')S._fi=null;else S._bi=null;resetIPrev(s);}
+function popDeckSel(sid){document.getElementById('cdeck').innerHTML=S.decks.map(d=>`<option value="${d.id}" ${d.id===sid?'selected':''}>${d.emoji} ${d.name}</option>`).join('');}
+function saveCard(){
+  const front=document.getElementById('cfront').value.trim(),back=document.getElementById('cback').value.trim(),did=document.getElementById('cdeck').value;
+  if(!front||!back){notify('Fill both sides','error');return;}
+  if(S.editCard){const i=S.cards.findIndex(c=>c.id===S.editCard);if(i!==-1){S.cards[i].front=front;S.cards[i].back=back;S.cards[i].deckId=did;S.cards[i].frontImg=S._fi;S.cards[i].backImg=S._bi;}}
+  else S.cards.push({id:uid(),deckId:did,front,back,status:'new',interval:0,due:Date.now(),frontImg:S._fi,backImg:S._bi});
+  persist();closeModal('mo-card');if(S.cur)renderCards();else showHome();notify(S.editCard?'Card updated ✓':'Card added ✓','success');
+}
+function delCard(id){if(!confirm('Delete this card?'))return;S.cards=S.cards.filter(c=>c.id!==id);persist();renderCards();}
+function openModal(id){document.getElementById(id).classList.add('open');if(id==='mo-sync'){if(S.gh.token)document.getElementById('gh-token').value=S.gh.token;if(S.gh.gist)document.getElementById('gh-gist').value=S.gh.gist;}}
+function closeModal(id){document.getElementById(id).classList.remove('open');}
+
+// ═══════════════════════════════════
+// UTILS
+// ═══════════════════════════════════
+function esc(s){return(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>')}
+function escq(s){return(s||'').replace(/"/g,'""')}
+function shuf(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+function download(n,d,t){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([d],{type:t}));a.download=n;a.click();}
+let nt;
+function notify(msg,type='info'){const el=document.getElementById('notif');el.textContent=msg;el.className=`notif show ${type}`;clearTimeout(nt);nt=setTimeout(()=>el.classList.remove('show'),3000);}
+
+document.querySelectorAll('.mo').forEach(o=>o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('open');}));
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape')document.querySelectorAll('.mo').forEach(m=>m.classList.remove('open'));
+  if(e.key===' '&&!['INPUT','TEXTAREA','SELECT'].includes(document.activeElement.tagName)){e.preventDefault();if(S.sq.length&&S.si<S.sq.length)flipStudy();else if(S.wq.length&&S.wi<S.wq.length)wFlip();}
+  if(e.key==='n'&&!['INPUT','TEXTAREA','SELECT'].includes(document.activeElement.tagName))openNewCardModal();
+});
+
+load();showHome();
+</script>
+</body>
+</html>
