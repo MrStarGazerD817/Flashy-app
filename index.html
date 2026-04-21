@@ -1,1 +1,1230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Flashy</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Mono:wght@300;400&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#0c0c0e; --s:#141417; --s2:#1a1a1f; --s3:#222228; --s4:#2a2a32;
+  --b:#2c2c36; --b2:#3a3a46; --b3:#4a4a58;
+  --t:#eeeef5; --t2:#8888a0; --t3:#525268; --t4:#35353f;
+  --accent:#7c6af7; --a2:#a594f9; --a3:#c4b5fd; --glow:rgba(124,106,247,.2);
+  --green:#22c55e; --red:#ef4444; --yellow:#f59e0b; --blue:#3b82f6;
+  --r:16px; --r2:12px; --r3:8px; --r4:6px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;overflow:hidden}
+body{font-family:'Syne',sans-serif;background:var(--bg);color:var(--t);display:flex;flex-direction:column}
 
+/* ── TOPNAV ── */
+.topnav{height:52px;min-height:52px;background:var(--s);border-bottom:1px solid var(--b);display:flex;align-items:center;padding:0 16px;gap:12px;z-index:100}
+.nav-logo{display:flex;align-items:center;gap:9px;text-decoration:none;margin-right:4px}
+.nav-logo img{width:30px;height:30px;border-radius:8px;object-fit:cover;box-shadow:0 0 16px rgba(124,106,247,.4)}
+.nav-logo-text{font-size:18px;font-weight:800;letter-spacing:-.5px;background:linear-gradient(135deg,#fff 20%,var(--a2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.nav-divider{width:1px;height:20px;background:var(--b);margin:0 4px}
+.nav-btn{display:flex;align-items:center;gap:6px;padding:6px 12px;border-radius:var(--r4);border:none;background:none;color:var(--t2);font-family:'Syne',sans-serif;font-size:12.5px;font-weight:600;cursor:pointer;transition:all .15s;white-space:nowrap}
+.nav-btn:hover{background:var(--s2);color:var(--t)}
+.nav-btn.active{background:var(--glow);color:var(--a2)}
+.nav-btn .ni{font-size:14px}
+.nav-spacer{flex:1}
+.nav-action{display:flex;align-items:center;gap:6px;padding:7px 14px;border-radius:var(--r4);border:1px solid var(--b);background:var(--s2);color:var(--t2);font-family:'Syne',sans-serif;font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;white-space:nowrap}
+.nav-action:hover{border-color:var(--b2);color:var(--t)}
+.nav-action.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.nav-action.primary:hover{background:var(--a2);box-shadow:0 0 20px var(--glow)}
+.sync-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.sync-dot.on{background:var(--green);box-shadow:0 0 8px var(--green)}
+.sync-dot.off{background:var(--t3)}
+
+/* ── LAYOUT ── */
+.app{display:flex;flex:1;overflow:hidden}
+
+/* ── SIDEBAR ── */
+.sidebar{width:240px;min-width:240px;background:var(--s);border-right:1px solid var(--b);display:flex;flex-direction:column;overflow:hidden}
+.sb-sec{padding:14px 14px 5px;font-size:9.5px;font-weight:700;letter-spacing:1.8px;color:var(--t3);text-transform:uppercase}
+.sb-decks{flex:1;overflow-y:auto;padding:0 8px 8px}
+.sb-decks::-webkit-scrollbar{width:0}
+.di{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:var(--r4);cursor:pointer;font-size:13px;font-weight:500;color:var(--t2);transition:all .15s;position:relative}
+.di:hover{background:var(--s2);color:var(--t)}
+.di.active{background:var(--glow);color:var(--a2)}
+.di-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.di-name{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.di-cnt{font-size:10px;font-family:'DM Mono',monospace;color:var(--t3);background:var(--s3);padding:1px 6px;border-radius:20px}
+.di-due{font-size:9px;font-family:'DM Mono',monospace;color:var(--yellow);background:rgba(245,158,11,.1);padding:1px 5px;border-radius:20px}
+.sb-footer{padding:10px;border-top:1px solid var(--b);display:flex;gap:6px}
+.sb-fab{flex:1;padding:9px;border-radius:var(--r4);border:1px solid var(--b);background:var(--s2);color:var(--t2);font-family:'Syne',sans-serif;font-size:12px;font-weight:700;cursor:pointer;transition:all .15s;text-align:center}
+.sb-fab:hover{border-color:var(--accent);color:var(--a2)}
+.sb-fab.p{background:var(--accent);border-color:var(--accent);color:#fff}
+.sb-fab.p:hover{background:var(--a2);box-shadow:0 0 16px var(--glow)}
+
+/* ── MAIN ── */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
+.toolbar{display:flex;align-items:center;gap:8px;padding:10px 20px;border-bottom:1px solid var(--b);background:var(--s);flex-wrap:wrap;min-height:52px}
+.toolbar-title{font-size:15px;font-weight:700;flex:1;min-width:60px}
+.tb-btn{display:flex;align-items:center;gap:5px;padding:6px 12px;border-radius:var(--r4);border:1px solid var(--b);background:var(--s2);color:var(--t2);font-family:'Syne',sans-serif;font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;white-space:nowrap}
+.tb-btn:hover{border-color:var(--b2);color:var(--t)}
+.tb-btn.ac{background:var(--accent);border-color:var(--accent);color:#fff}
+.tb-btn.ac:hover{background:var(--a2);box-shadow:0 0 16px var(--glow)}
+.tb-btn.warn{background:rgba(239,68,68,.12);border-color:var(--red);color:var(--red)}
+.vtog{display:flex;background:var(--s2);border:1px solid var(--b);border-radius:var(--r4);padding:2px;gap:2px}
+.vb{padding:5px 10px;border-radius:5px;border:none;background:none;color:var(--t3);font-size:12px;cursor:pointer;transition:all .15s}
+.vb.active{background:var(--s3);color:var(--t)}
+.srch{position:relative;min-width:140px;max-width:260px;flex:1}
+.srch-ic{position:absolute;left:9px;top:50%;transform:translateY(-50%);color:var(--t3);font-size:13px;pointer-events:none}
+.srch input{width:100%;background:var(--s2);border:1px solid var(--b);border-radius:var(--r4);padding:6px 10px 6px 28px;color:var(--t);font-family:'Syne',sans-serif;font-size:12px;outline:none;transition:border-color .15s}
+.srch input:focus{border-color:var(--accent)}
+.srch input::placeholder{color:var(--t3)}
+
+/* ── CONTENT ── */
+.content{flex:1;overflow-y:auto;padding:20px}
+.content::-webkit-scrollbar{width:4px}
+.content::-webkit-scrollbar-thumb{background:var(--b2);border-radius:4px}
+
+/* ── DECK HOME ── */
+.dg{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px}
+.dtile{background:var(--s);border:1px solid var(--b);border-radius:var(--r);padding:18px 18px 16px;cursor:pointer;transition:all .2s;position:relative;overflow:hidden;animation:fadeUp .2s ease both}
+.dtile:hover{border-color:var(--b2);transform:translateY(-2px);box-shadow:0 12px 32px rgba(0,0,0,.4)}
+.dtile-bar{position:absolute;top:0;left:0;right:0;height:3px}
+.dtile-icon{font-size:28px;margin-bottom:10px;line-height:1}
+.dtile-name{font-size:14px;font-weight:700;margin-bottom:3px}
+.dtile-cnt{font-size:11px;color:var(--t3);font-family:'DM Mono',monospace;margin-bottom:12px}
+.dtile-pills{display:flex;gap:6px;flex-wrap:wrap}
+.pill{font-size:10px;font-family:'DM Mono',monospace;padding:2px 8px;border-radius:20px}
+.pill.new{background:rgba(124,106,247,.15);color:var(--a2)}
+.pill.due{background:rgba(245,158,11,.15);color:var(--yellow)}
+.pill.done{background:rgba(34,197,94,.15);color:var(--green)}
+.dtile.add{border-style:dashed;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;min-height:150px;color:var(--t3)}
+.dtile.add:hover{color:var(--a2);border-color:var(--accent)}
+.dtile-actions{position:absolute;top:10px;right:10px;display:none;gap:4px}
+.dtile:hover .dtile-actions{display:flex}
+.dtile-act-btn{width:24px;height:24px;border-radius:50%;border:none;background:var(--s3);color:var(--t2);font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.dtile-act-btn:hover.del{background:rgba(239,68,68,.2);color:var(--red)}
+.dtile-act-btn:hover{background:var(--s4);color:var(--t)}
+
+/* ── CARDS GRID ── */
+.cg{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:11px}
+.ct{background:var(--s);border:1px solid var(--b);border-radius:var(--r2);padding:14px;cursor:pointer;transition:all .2s;position:relative;display:flex;flex-direction:column;min-height:110px;animation:fadeUp .2s ease both}
+.ct:hover{border-color:var(--b2);transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.35)}
+.ct-img{width:100%;height:70px;object-fit:cover;border-radius:6px;margin-bottom:9px}
+.ct-front{font-family:'Instrument Serif',serif;font-size:13px;line-height:1.5;flex:1;color:var(--t)}
+.ct-back{font-family:'DM Mono',monospace;font-size:10.5px;color:var(--t2);line-height:1.5;margin-top:8px;padding-top:8px;border-top:1px solid var(--b);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.ct-foot{display:flex;align-items:center;gap:6px;margin-top:8px}
+.badge{font-size:9.5px;font-family:'DM Mono',monospace;padding:2px 7px;border-radius:20px}
+.badge.new{background:rgba(124,106,247,.15);color:var(--a2)}
+.badge.due{background:rgba(245,158,11,.15);color:var(--yellow)}
+.badge.learned{background:rgba(34,197,94,.15);color:var(--green)}
+.ct-acts{position:absolute;top:8px;right:8px;display:none;gap:4px}
+.ct:hover .ct-acts{display:flex}
+.ct-act{width:22px;height:22px;border-radius:50%;border:none;background:var(--s3);color:var(--t2);font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.ct-act:hover{background:var(--s4);color:var(--t)}
+.ct-act.del:hover{background:rgba(239,68,68,.2);color:var(--red)}
+.ct.add{border-style:dashed;align-items:center;justify-content:center;color:var(--t3);gap:5px;font-size:12.5px}
+.ct.add:hover{color:var(--a2);border-color:var(--accent)}
+
+/* ── LIST VIEW ── */
+.cl{display:flex;flex-direction:column;gap:6px}
+.cl-row{background:var(--s);border:1px solid var(--b);border-radius:var(--r3);padding:12px 14px;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:12px;position:relative}
+.cl-row:hover{border-color:var(--b2);background:var(--s2)}
+.cl-thumb{width:32px;height:32px;object-fit:cover;border-radius:5px;flex-shrink:0}
+.cl-front{font-family:'Instrument Serif',serif;font-size:13px;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cl-back{font-family:'DM Mono',monospace;font-size:11px;color:var(--t2);flex:2;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cl-row-acts{display:flex;align-items:center;gap:6px;flex-shrink:0}
+
+/* ── STUDY ── */
+.study-wrap{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:20px;padding:24px;max-width:700px;margin:0 auto;width:100%}
+.s-prog{width:100%;display:flex;align-items:center;gap:10px;font-size:11px;color:var(--t2);font-family:'DM Mono',monospace}
+.s-bar{flex:1;height:3px;background:var(--s3);border-radius:2px;overflow:hidden}
+.s-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--a2));border-radius:2px;transition:width .35s}
+.flashcard{width:100%;min-height:260px;background:var(--s);border:1px solid var(--b2);border-radius:20px;padding:36px 40px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;position:relative;box-shadow:0 24px 64px rgba(0,0,0,.5);transition:box-shadow .3s,background .25s}
+.flashcard:hover{box-shadow:0 28px 80px rgba(0,0,0,.6)}
+.flashcard.flipped{background:var(--s2);border-color:var(--accent);border-opacity:.3}
+.fc-label{position:absolute;top:14px;left:18px;font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--t3);font-family:'DM Mono',monospace}
+.fc-deck{position:absolute;top:14px;right:18px;font-size:10px;color:var(--t3);font-family:'DM Mono',monospace}
+.study-img{max-width:100%;max-height:150px;object-fit:contain;border-radius:8px;margin-bottom:18px}
+.fc-q{font-family:'Instrument Serif',serif;font-size:24px;text-align:center;line-height:1.5;color:var(--t)}
+.fc-a{font-family:'DM Mono',monospace;font-size:13px;text-align:center;line-height:1.7;color:var(--t2);margin-top:18px;padding-top:18px;border-top:1px solid var(--b);width:100%}
+.fc-hint{font-size:10px;color:var(--t3);font-family:'DM Mono',monospace;margin-top:10px}
+.rate-row{display:flex;gap:10px;width:100%}
+.rb{flex:1;padding:11px 6px;border-radius:var(--r3);border:1px solid var(--b);background:var(--s);color:var(--t);font-family:'Syne',sans-serif;font-size:12px;font-weight:700;cursor:pointer;transition:all .15s;text-align:center;display:flex;flex-direction:column;align-items:center;gap:3px}
+.rb:hover{transform:translateY(-2px)}
+.rb.again{border-color:rgba(239,68,68,.4)}.rb.again:hover{background:rgba(239,68,68,.1);color:var(--red);border-color:var(--red)}
+.rb.hard{border-color:rgba(245,158,11,.4)}.rb.hard:hover{background:rgba(245,158,11,.1);color:var(--yellow);border-color:var(--yellow)}
+.rb.good{border-color:rgba(34,197,94,.4)}.rb.good:hover{background:rgba(34,197,94,.1);color:var(--green);border-color:var(--green)}
+.rb.easy{border-color:rgba(124,106,247,.4)}.rb.easy:hover{background:var(--glow);color:var(--a2);border-color:var(--accent)}
+.rb-sub{font-size:9px;font-weight:400;color:var(--t3);font-family:'DM Mono',monospace}
+
+/* ── COMPLETE ── */
+.done-wrap{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:14px;text-align:center;padding:40px}
+.done-emoji{font-size:56px}
+.done-title{font-size:26px;font-weight:800}
+.done-sub{font-size:13px;color:var(--t2);max-width:360px;line-height:1.7}
+.done-stats{display:flex;gap:12px;margin-top:6px;flex-wrap:wrap;justify-content:center}
+.ds{display:flex;flex-direction:column;align-items:center;gap:3px;background:var(--s);border:1px solid var(--b);border-radius:var(--r3);padding:14px 20px}
+.ds-n{font-size:26px;font-weight:800}.ds-l{font-size:10px;color:var(--t2);font-family:'DM Mono',monospace}
+
+/* ── ANALYTICS ── */
+.ag{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:11px;margin-bottom:18px}
+.acard{background:var(--s);border:1px solid var(--b);border-radius:var(--r2);padding:18px;position:relative;overflow:hidden}
+.acard::after{content:attr(data-icon);position:absolute;right:12px;top:50%;transform:translateY(-50%);font-size:30px;opacity:.07}
+.a-label{font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--t3);margin-bottom:7px;font-family:'DM Mono',monospace}
+.a-num{font-size:30px;font-weight:800;line-height:1}
+.a-sub{font-size:11px;color:var(--t2);margin-top:4px;font-family:'DM Mono',monospace}
+.streak-num{font-size:42px;font-weight:800;background:linear-gradient(135deg,var(--yellow),#f97316);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1}
+.chart-box{background:var(--s);border:1px solid var(--b);border-radius:var(--r2);padding:18px;margin-bottom:11px}
+.chart-title{font-size:13px;font-weight:700;margin-bottom:14px;color:var(--t)}
+.bar-chart{display:flex;align-items:flex-end;gap:5px;height:90px}
+.bcol{display:flex;flex-direction:column;align-items:center;gap:3px;flex:1}
+.bar{width:100%;border-radius:4px 4px 0 0;min-height:2px;transition:height .5s}
+.blab{font-size:8px;color:var(--t3);font-family:'DM Mono',monospace;text-align:center}
+.bval{font-size:8px;color:var(--t2);font-family:'DM Mono',monospace}
+.hmap{display:grid;grid-template-columns:repeat(26,1fr);gap:3px}
+.hcell{aspect-ratio:1;border-radius:2px}
+.dp-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--b)}
+.dp-row:last-child{border:none}
+.dp-name{font-size:13px;font-weight:600;width:100px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dp-bar{flex:1;height:5px;background:var(--s3);border-radius:3px;overflow:hidden}
+.dp-fill{height:100%;border-radius:3px;transition:width .5s}
+.dp-pct{font-size:11px;font-family:'DM Mono',monospace;color:var(--t2);width:32px;text-align:right}
+.dp-cnt{font-size:11px;font-family:'DM Mono',monospace;color:var(--t3);width:44px;text-align:right}
+
+/* ── SYNC PAGE ── */
+.sync-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+@media(max-width:600px){.sync-grid{grid-template-columns:1fr}}
+.sync-card{background:var(--s);border:1px solid var(--b);border-radius:var(--r2);padding:20px}
+.sync-card-title{font-size:13px;font-weight:700;margin-bottom:4px;display:flex;align-items:center;gap:8px}
+.sync-card-sub{font-size:11.5px;color:var(--t2);margin-bottom:14px;line-height:1.6}
+.conn-status{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-family:'DM Mono',monospace;padding:4px 10px;border-radius:20px;margin-bottom:12px}
+.conn-status.on{background:rgba(34,197,94,.1);color:var(--green)}
+.conn-status.off{background:rgba(239,68,68,.1);color:var(--red)}
+.gist-id-display{font-family:'DM Mono',monospace;font-size:10px;color:var(--t3);background:var(--s2);border:1px solid var(--b);border-radius:4px;padding:4px 8px;margin-bottom:12px;word-break:break-all;display:none}
+.gist-id-display.show{display:block}
+.sync-btn-row{display:flex;gap:8px;flex-wrap:wrap}
+
+/* ── MODAL ── */
+.mo{position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(10px);z-index:2000;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .2s}
+.mo.open{opacity:1;pointer-events:all}
+.modal{background:var(--s);border:1px solid var(--b2);border-radius:20px;width:100%;max-width:540px;max-height:90vh;overflow-y:auto;box-shadow:0 48px 100px rgba(0,0,0,.7);transform:translateY(24px);transition:transform .22s}
+.mo.open .modal{transform:translateY(0)}
+.modal::-webkit-scrollbar{width:4px}
+.modal::-webkit-scrollbar-thumb{background:var(--b2);border-radius:4px}
+.mhdr{display:flex;align-items:center;justify-content:space-between;padding:18px 20px 14px;border-bottom:1px solid var(--b);position:sticky;top:0;background:var(--s);z-index:1}
+.m-title{font-size:16px;font-weight:700}
+.m-close{width:28px;height:28px;border-radius:50%;border:none;background:var(--s2);color:var(--t2);font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.m-close:hover{background:var(--s3);color:var(--t)}
+.mbody{padding:18px 20px}
+.mfoot{padding:12px 20px 18px;border-top:1px solid var(--b);display:flex;gap:8px;justify-content:flex-end}
+.fg{margin-bottom:14px}
+.fl{display:block;font-size:10.5px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--t3);margin-bottom:6px}
+.fi,.fta{width:100%;background:var(--s2);border:1px solid var(--b);border-radius:var(--r4);padding:10px 12px;color:var(--t);font-family:'Syne',sans-serif;font-size:13px;outline:none;transition:border-color .15s}
+.fta{font-family:'DM Mono',monospace;font-size:12px;resize:vertical;min-height:80px;line-height:1.6}
+.fi:focus,.fta:focus{border-color:var(--accent)}
+.fi::placeholder,.fta::placeholder{color:var(--t3)}
+.fi[type=password]{letter-spacing:2px}
+.cpicker{display:flex;gap:7px;flex-wrap:wrap}
+.cdot{width:24px;height:24px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:all .15s;flex-shrink:0}
+.cdot.on{border-color:#fff;transform:scale(1.2)}
+.img-drop{border:2px dashed var(--b2);border-radius:var(--r3);padding:16px;text-align:center;cursor:pointer;transition:all .15s;background:var(--s2);position:relative}
+.img-drop:hover{border-color:var(--accent);background:rgba(124,106,247,.06)}
+.img-drop input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.img-preview{max-width:100%;max-height:120px;object-fit:contain;border-radius:6px;display:block;margin:8px auto 4px}
+.img-rm{background:none;border:none;font-size:11px;color:var(--red);cursor:pointer;font-family:'Syne',sans-serif;font-weight:600;padding:3px 8px;border-radius:4px;display:inline-flex;align-items:center;gap:3px}
+.img-rm:hover{background:rgba(239,68,68,.1)}
+.btn{padding:9px 18px;border-radius:var(--r4);border:1px solid var(--b);font-family:'Syne',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:all .15s}
+.btn-g{background:none;color:var(--t2)}.btn-g:hover{background:var(--s2);color:var(--t)}
+.btn-p{background:var(--accent);border-color:var(--accent);color:#fff}.btn-p:hover{background:var(--a2);box-shadow:0 0 16px var(--glow)}
+.btn-d{background:rgba(239,68,68,.1);border-color:var(--red);color:var(--red)}.btn-d:hover{background:rgba(239,68,68,.2)}
+.warn-box{background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.3);border-radius:var(--r4);padding:10px 13px;font-size:11.5px;color:var(--yellow);line-height:1.6;margin-top:14px}
+code{background:var(--s3);padding:1px 5px;border-radius:3px;font-family:'DM Mono',monospace;font-size:11px;color:var(--a3)}
+
+/* ── WIDGET ── */
+#widget{display:none;position:fixed;bottom:24px;right:24px;width:300px;background:var(--s);border:1px solid var(--b2);border-radius:18px;box-shadow:0 28px 80px rgba(0,0,0,.75);z-index:3000;flex-direction:column}
+#widget.open{display:flex}
+.w-hdr{display:flex;align-items:center;justify-content:space-between;padding:12px 14px 10px;border-bottom:1px solid var(--b);cursor:move;user-select:none;background:linear-gradient(135deg,rgba(124,106,247,.12),transparent);border-radius:18px 18px 0 0}
+.w-logo{display:flex;align-items:center;gap:7px}
+.w-logo img{width:18px;height:18px;border-radius:4px;object-fit:cover}
+.w-logo span{font-size:12px;font-weight:700;color:var(--t2)}
+.w-close{width:20px;height:20px;border-radius:50%;border:none;background:var(--s3);color:var(--t3);font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.w-close:hover{background:var(--s4);color:var(--t)}
+.w-body{padding:12px;display:flex;flex-direction:column;gap:9px}
+.w-select{width:100%;background:var(--s2);border:1px solid var(--b);border-radius:var(--r4);padding:7px 10px;color:var(--t);font-family:'Syne',sans-serif;font-size:12px;outline:none}
+.w-ta{width:100%;background:var(--s2);border:1px solid var(--b);border-radius:var(--r4);padding:8px 10px;color:var(--t);font-family:'DM Mono',monospace;font-size:11.5px;resize:none;line-height:1.5;outline:none;transition:border-color .15s}
+.w-ta:focus{border-color:var(--accent)}
+.w-ta::placeholder{color:var(--t3)}
+.w-row{display:flex;gap:7px}
+.w-btn{flex:1;padding:8px;border-radius:var(--r4);border:1px solid var(--accent);background:var(--accent);color:#fff;font-family:'Syne',sans-serif;font-size:12px;font-weight:700;cursor:pointer;transition:all .15s}
+.w-btn:hover{background:var(--a2)}
+.w-btn.ghost{background:none;border-color:var(--b);color:var(--t2)}
+.w-btn.ghost:hover{border-color:var(--b2);color:var(--t)}
+.w-feedback{font-size:11px;font-family:'DM Mono',monospace;text-align:center;display:none;padding:2px 0}
+.w-counter{font-size:10px;font-family:'DM Mono',monospace;color:var(--t3);text-align:center}
+#widget-fab{position:fixed;bottom:24px;right:24px;width:46px;height:46px;border-radius:50%;background:linear-gradient(135deg,var(--accent),#9b59f5);border:none;color:#fff;font-size:20px;cursor:pointer;box-shadow:0 8px 24px rgba(124,106,247,.5);z-index:2999;transition:all .2s;display:flex;align-items:center;justify-content:center}
+#widget-fab:hover{transform:scale(1.08);box-shadow:0 12px 32px rgba(124,106,247,.65)}
+#widget-fab.hidden{display:none}
+
+/* ── EMPTY ── */
+.empty{display:flex;flex-direction:column;align-items:center;justify-content:center;height:240px;gap:10px;color:var(--t3);text-align:center}
+.empty-icon{font-size:40px;opacity:.35}
+.empty-title{font-size:14px;font-weight:600;color:var(--t2)}
+.empty-sub{font-size:12px}
+
+/* ── NOTIF ── */
+.notif{position:fixed;bottom:80px;right:22px;background:var(--s2);border:1px solid var(--b2);border-radius:var(--r3);padding:10px 16px;font-size:12px;font-weight:600;z-index:9999;transform:translateY(20px);opacity:0;transition:all .25s;box-shadow:0 8px 32px rgba(0,0,0,.5);max-width:260px;pointer-events:none}
+.notif.show{transform:translateY(0);opacity:1}
+.notif.ok{border-color:rgba(34,197,94,.4);color:var(--green)}
+.notif.err{border-color:rgba(239,68,68,.4);color:var(--red)}
+.notif.inf{border-color:rgba(124,106,247,.4);color:var(--a2)}
+
+/* ── UTILS ── */
+.info-box{background:var(--s2);border:1px solid var(--b);border-radius:var(--r3);padding:12px 15px;font-size:11.5px;color:var(--t2);line-height:1.7}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.fade-in{animation:fadeUp .2s ease forwards}
+</style>
+</head>
+<body>
+
+<!-- ── TOP NAV ── -->
+<nav class="topnav">
+  <a class="nav-logo" onclick="showHome()" href="javascript:void(0)">
+    <svg width="30" height="30" viewBox="0 0 30 30" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0;border-radius:7px">
+  <defs><linearGradient id="flg" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#9b59f5"/><stop offset="100%" stop-color="#f472b6"/></linearGradient></defs>
+  <rect x="5" y="7" width="21" height="17" rx="5" fill="#3d2a7a" transform="rotate(-8 15 15)"/>
+  <rect x="5" y="7" width="21" height="17" rx="5" fill="#5b3db5" transform="rotate(-3 15 15)"/>
+  <rect x="4" y="5" width="22" height="18" rx="5" fill="url(#flg)"/>
+  <path d="M16.5 8.5l-4.5 7.5h4.5l-2.5 5.5 7-9.5h-5z" fill="white" fill-opacity="0.95"/>
+</svg>
+    <span class="nav-logo-text">Flashy</span>
+  </a>
+  <div class="nav-divider"></div>
+  <button class="nav-btn active" id="nb-home" onclick="showHome()"><span class="ni">🏠</span>Decks</button>
+  <button class="nav-btn" id="nb-analytics" onclick="showAnalytics()"><span class="ni">📊</span>Analytics</button>
+  <button class="nav-btn" id="nb-sync" onclick="showSync()"><span class="ni">☁️</span>Sync</button>
+  <div class="nav-spacer"></div>
+  <div id="nav-sync-status" style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--t3);font-family:'DM Mono',monospace;margin-right:8px">
+    <div class="sync-dot off" id="sync-dot"></div><span id="sync-label">Not synced</span>
+  </div>
+  <button class="nav-action" onclick="openNewDeckModal()">+ Deck</button>
+  <button class="nav-action primary" onclick="openNewCardModal()">+ Card</button>
+</nav>
+
+<!-- ── APP BODY ── -->
+<div class="app">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sb-sec">Your Decks</div>
+    <div class="sb-decks" id="sdlist"></div>
+    <div class="sb-footer">
+      <button class="sb-fab" onclick="openNewDeckModal()">+ Deck</button>
+      <button class="sb-fab p" onclick="openNewCardModal()">+ Card</button>
+      <button class="sb-fab" style="flex:0;padding:9px 11px" onclick="toggleWidget()" title="Quick Add">✦</button>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+    <div class="toolbar" id="toolbar">
+      <div class="toolbar-title" id="ttitle">All Decks</div>
+      <div id="tactions" style="display:flex;gap:7px;align-items:center;flex-wrap:wrap"></div>
+    </div>
+    <div class="content" id="content"></div>
+  </main>
+</div>
+
+<!-- ── WIDGET ── -->
+<button id="widget-fab" onclick="toggleWidget()" title="Quick Add Card">✦</button>
+<div id="widget">
+  <div class="w-hdr" id="w-hdr">
+    <div class="w-logo">
+      <svg width="18" height="18" viewBox="0 0 30 30" xmlns="http://www.w3.org/2000/svg" style="border-radius:4px">
+  <defs><linearGradient id="flgs" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#9b59f5"/><stop offset="100%" stop-color="#f472b6"/></linearGradient></defs>
+  <rect x="5" y="7" width="21" height="17" rx="5" fill="#3d2a7a" transform="rotate(-8 15 15)"/>
+  <rect x="5" y="7" width="21" height="17" rx="5" fill="#5b3db5" transform="rotate(-3 15 15)"/>
+  <rect x="4" y="5" width="22" height="18" rx="5" fill="url(#flgs)"/>
+  <path d="M16.5 8.5l-4.5 7.5h4.5l-2.5 5.5 7-9.5h-5z" fill="white" fill-opacity="0.95"/>
+</svg>
+      <span>Quick Add Card</span>
+    </div>
+    <button class="w-close" onclick="closeWidget()">×</button>
+  </div>
+  <div class="w-body">
+    <select class="w-select" id="w-deck"></select>
+    <textarea class="w-ta" id="w-front" placeholder="Front — question or term..." rows="2"></textarea>
+    <textarea class="w-ta" id="w-back" placeholder="Back — answer..." rows="3"></textarea>
+    <div class="w-row">
+      <button class="w-btn" onclick="wAdd()">+ Add Card</button>
+      <button class="w-btn ghost" onclick="wClear()">Clear</button>
+    </div>
+    <div class="w-feedback" id="w-fb"></div>
+    <div class="w-counter" id="w-counter"></div>
+  </div>
+</div>
+
+<!-- ── MODALS ── -->
+
+<!-- Deck modal -->
+<div class="mo" id="mo-deck">
+  <div class="modal">
+    <div class="mhdr"><div class="m-title" id="deck-modal-title">New Deck</div><button class="m-close" onclick="closeModal('mo-deck')">×</button></div>
+    <div class="mbody">
+      <div class="fg"><label class="fl">Deck Name</label><input class="fi" id="d-name" placeholder="e.g. Cardiology, Pharmacology..."></div>
+      <div class="fg"><label class="fl">Emoji Icon</label><input class="fi" id="d-emoji" placeholder="🫀" maxlength="4" style="font-size:20px;padding:8px 12px"></div>
+      <div class="fg"><label class="fl">Color</label><div class="cpicker" id="cpicker"></div></div>
+    </div>
+    <div class="mfoot">
+      <button class="btn btn-g" onclick="closeModal('mo-deck')">Cancel</button>
+      <button class="btn btn-p" onclick="saveDeck()">Save Deck</button>
+    </div>
+  </div>
+</div>
+
+<!-- Card modal -->
+<div class="mo" id="mo-card">
+  <div class="modal">
+    <div class="mhdr"><div class="m-title" id="card-modal-title">New Card</div><button class="m-close" onclick="closeModal('mo-card')">×</button></div>
+    <div class="mbody">
+      <div class="fg"><label class="fl">Deck</label><select class="fi" id="c-deck"></select></div>
+      <div class="fg"><label class="fl">Front (Question)</label><textarea class="fta" id="c-front" placeholder="Type the question or term..."></textarea></div>
+      <div class="fg">
+        <label class="fl">Front Image (optional)</label>
+        <div class="img-drop" onclick="document.getElementById('fi-inp').click()">
+          <input type="file" id="fi-inp" accept="image/*" style="display:none" onchange="handleImg('f',this)">
+          <div id="fi-wrap"><div style="font-size:20px;margin-bottom:4px">🖼️</div><div style="font-size:11px;color:var(--t3)">Tap to attach image</div></div>
+        </div>
+      </div>
+      <div class="fg"><label class="fl">Back (Answer)</label><textarea class="fta" id="c-back" placeholder="Type the answer..."></textarea></div>
+      <div class="fg">
+        <label class="fl">Back Image (optional)</label>
+        <div class="img-drop" onclick="document.getElementById('bi-inp').click()">
+          <input type="file" id="bi-inp" accept="image/*" style="display:none" onchange="handleImg('b',this)">
+          <div id="bi-wrap"><div style="font-size:20px;margin-bottom:4px">🖼️</div><div style="font-size:11px;color:var(--t3)">Tap to attach image</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="mfoot">
+      <button class="btn btn-d" id="card-delete-btn" onclick="deleteCurrentCard()" style="display:none;margin-right:auto">Delete Card</button>
+      <button class="btn btn-g" onclick="closeModal('mo-card')">Cancel</button>
+      <button class="btn btn-p" onclick="saveCard()">Save Card</button>
+    </div>
+  </div>
+</div>
+
+<!-- Sync config modal -->
+<div class="mo" id="mo-sync">
+  <div class="modal">
+    <div class="mhdr"><div class="m-title">GitHub Gist Sync Setup</div><button class="m-close" onclick="closeModal('mo-sync')">×</button></div>
+    <div class="mbody">
+      <p style="font-size:12.5px;color:var(--t2);margin-bottom:16px;line-height:1.7">
+        Flashy uses GitHub Gist as a free cloud sync backend. Your data is stored in a <strong style="color:var(--t)">private Gist</strong> only you can access.
+      </p>
+      <div class="fg">
+        <label class="fl">GitHub Personal Access Token</label>
+        <input class="fi" id="gh-tok" type="password" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" autocomplete="off">
+        <div style="margin-top:6px;font-size:11px;color:var(--t3);line-height:1.6">Generate at <code>github.com/settings/tokens</code> → Fine-grained tokens → Set <code>Gists: Read and write</code></div>
+      </div>
+      <div class="fg">
+        <label class="fl">Gist ID <span style="text-transform:none;font-weight:400;color:var(--t3)">(leave blank on first use — auto-created)</span></label>
+        <input class="fi" id="gh-gid" placeholder="e.g. a1b2c3d4e5f6...">
+      </div>
+      <div class="warn-box">⚠ Images embedded in cards are stored as base64 and can make the Gist large. If sync fails, export a JSON backup first.</div>
+    </div>
+    <div class="mfoot">
+      <button class="btn btn-g" onclick="closeModal('mo-sync')">Cancel</button>
+      <button class="btn btn-p" onclick="saveGHConfig()">Save & Sync</button>
+    </div>
+  </div>
+</div>
+
+<div class="notif" id="notif"></div>
+
+<script>
+// ════════════════════════════════════════════════════
+// STATE
+// ════════════════════════════════════════════════════
+const COLORS = ['#7c6af7','#f472b6','#22c55e','#f59e0b','#3b82f6','#ef4444','#a78bfa','#2dd4bf','#fb923c','#e879f9'];
+let S = {
+  decks: [], cards: [], cur: null, view: 'grid',
+  editCard: null, editDeck: null,
+  sq: [], si: 0, sf: false, ss: {again:0,hard:0,good:0,easy:0},
+  gh: { token: '', gist: '', lastSync: null },
+  history: [],
+  _fi: null, _bi: null,
+  wCount: 0
+};
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem('flashy4');
+    if (raw) { const p = JSON.parse(raw); Object.assign(S, p); }
+  } catch(e) {}
+  if (!S.decks || !S.decks.length) seedData();
+  if (!S.history) S.history = [];
+  if (!S.gh) S.gh = { token:'', gist:'', lastSync:null };
+  S._fi = null; S._bi = null; S.sq = []; S.si = 0; S.sf = false;
+  updateSyncStatus();
+}
+
+function persist() {
+  try {
+    const data = JSON.stringify({ decks:S.decks, cards:S.cards, gh:S.gh, history:S.history });
+    localStorage.setItem('flashy4', data);
+  } catch(e) { notify('Storage full — export backup!', 'err'); }
+}
+
+const uid = () => Math.random().toString(36).slice(2,9) + Date.now().toString(36).slice(-4);
+
+function mkCard(deckId, front, back, status='new', interval=0) {
+  return { id:uid(), deckId, front, back, status, interval,
+           due: Date.now() + interval*86400000, frontImg:null, backImg:null };
+}
+
+function seedData() {
+  const d1 = { id:uid(), name:'Cardiology', emoji:'🫀', color:'#f472b6' };
+  const d2 = { id:uid(), name:'Pharmacology', emoji:'💊', color:'#22c55e' };
+  const d3 = { id:uid(), name:'Neurology', emoji:'🧠', color:'#7c6af7' };
+  const d4 = { id:uid(), name:'Gynaecology', emoji:'🩺', color:'#f59e0b' };
+  S.decks = [d1, d2, d3, d4];
+  S.cards = [
+    mkCard(d1.id,'Most common cause of mitral stenosis?','Rheumatic fever / Rheumatic heart disease'),
+    mkCard(d1.id,'Murmur of MS — character & timing?','Low-pitched mid-diastolic rumble at apex. Presystolic accentuation in sinus rhythm.','learned',3),
+    mkCard(d1.id,'Shorter A2-OS interval in MS means?','More severe stenosis — higher LA pressure → earlier valve opening.'),
+    mkCard(d2.id,'DOC for WPW with AF?','Procainamide IV. CCBs/digoxin/adenosine CONTRAINDICATED (accelerate accessory pathway).','due',1),
+    mkCard(d2.id,'MOA of Metformin?','Activates AMPK → inhibits hepatic gluconeogenesis. Does not cause hypoglycemia.'),
+    mkCard(d3.id,'NPH Triad?','Wet + Wacky + Wobbly\nUrinary incontinence + Dementia + Gait apraxia'),
+    mkCard(d4.id,'GnRH analogue uses?','Pulsatile → ↑LH, ↑FSH\n1. Delayed puberty  2. Kallmann  3. Anovulation'),
+    mkCard(d4.id,'GnRH antagonist uses?','Continuous → ↓LH, ↓FSH\n1. Precocious puberty  2. Fibroid  3. Endometriosis\n4. ER+ve breast Ca  5. Hirsutism  6. Prostate Ca'),
+  ];
+  // Seed demo history
+  const now = Date.now();
+  const rs = ['good','easy','good','hard','again','good','easy'];
+  for (let i = 7; i >= 0; i--) {
+    S.cards.slice(0, 3 + Math.floor(Math.random()*3)).forEach(c => {
+      S.history.push({ date: now - i*86400000, cardId: c.id, deckId: c.deckId, rating: rs[Math.floor(Math.random()*rs.length)] });
+    });
+  }
+  persist();
+}
+
+// ════════════════════════════════════════════════════
+// SYNC STATUS
+// ════════════════════════════════════════════════════
+function updateSyncStatus() {
+  const dot = document.getElementById('sync-dot');
+  const label = document.getElementById('sync-label');
+  if (!dot || !label) return;
+  if (S.gh.token && S.gh.gist) {
+    dot.className = 'sync-dot on';
+    const t = S.gh.lastSync ? new Date(S.gh.lastSync).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}) : 'pending';
+    label.textContent = 'Synced ' + t;
+  } else if (S.gh.token) {
+    dot.className = 'sync-dot off';
+    label.textContent = 'Connected — push to sync';
+  } else {
+    dot.className = 'sync-dot off';
+    label.textContent = 'Not synced';
+  }
+}
+
+// ════════════════════════════════════════════════════
+// SIDEBAR
+// ════════════════════════════════════════════════════
+function renderSB() {
+  const due = c => c.status === 'new' || c.status === 'due';
+  document.getElementById('sdlist').innerHTML = S.decks.map(d => {
+    const cs = S.cards.filter(c => c.deckId === d.id);
+    const dueN = cs.filter(due).length;
+    return `<div class="di ${S.cur?.id===d.id?'active':''}" onclick="openDeck('${d.id}')">
+      <div class="di-dot" style="background:${d.color}"></div>
+      <span class="di-name">${d.name}</span>
+      ${dueN ? `<span class="di-due">${dueN}</span>` : `<span class="di-cnt">${cs.length}</span>`}
+    </div>`;
+  }).join('');
+}
+
+// ════════════════════════════════════════════════════
+// NAV
+// ════════════════════════════════════════════════════
+function setNav(id) {
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.di').forEach(d => d.classList.remove('active'));
+  if (id) document.getElementById(id)?.classList.add('active');
+}
+
+function showSearchBar(show) {
+  // search is inline in toolbar - handled per-view
+}
+
+// ════════════════════════════════════════════════════
+// HOME
+// ════════════════════════════════════════════════════
+function showHome() {
+  S.cur = null; setNav('nb-home');
+  document.getElementById('ttitle').textContent = 'All Decks';
+  document.getElementById('tactions').innerHTML = `<button class="tb-btn ac" onclick="openNewDeckModal()">+ New Deck</button>`;
+  const totalDue = S.cards.filter(c => c.status==='new'||c.status==='due').length;
+  let html = '';
+  if (totalDue > 0) {
+    html += `<div style="margin-bottom:16px;padding:14px 18px;background:linear-gradient(135deg,rgba(124,106,247,.1),rgba(192,132,252,.04));border:1px solid rgba(124,106,247,.22);border-radius:var(--r2);display:flex;align-items:center;gap:14px;animation:fadeUp .2s ease">
+      <div style="font-size:26px">⚡</div>
+      <div><div style="font-size:14px;font-weight:700;margin-bottom:2px">${totalDue} cards ready to study</div><div style="font-size:11.5px;color:var(--t2)">Keep your streak going</div></div>
+      <button class="tb-btn ac" style="margin-left:auto" onclick="studyAll()">Study All</button>
+    </div>`;
+  }
+  html += `<div class="dg">` + S.decks.map((d,i) => {
+    const cs = S.cards.filter(c => c.deckId===d.id);
+    const nw = cs.filter(c=>c.status==='new').length;
+    const du = cs.filter(c=>c.status==='due').length;
+    const lr = cs.filter(c=>c.status==='learned').length;
+    return `<div class="dtile" style="animation-delay:${i*0.04}s" onclick="openDeck('${d.id}')">
+      <div class="dtile-bar" style="background:${d.color}"></div>
+      <div class="dtile-actions">
+        <button class="dtile-act-btn" onclick="event.stopPropagation();editDeckModal('${d.id}')" title="Edit">✏</button>
+        <button class="dtile-act-btn del" onclick="event.stopPropagation();deleteDeck('${d.id}')" title="Delete">×</button>
+      </div>
+      <div class="dtile-icon">${d.emoji||'📦'}</div>
+      <div class="dtile-name">${d.name}</div>
+      <div class="dtile-cnt">${cs.length} card${cs.length!==1?'s':''}</div>
+      <div class="dtile-pills">
+        ${nw?`<span class="pill new">${nw} new</span>`:''}
+        ${du?`<span class="pill due">${du} due</span>`:''}
+        ${lr?`<span class="pill done">${lr} done</span>`:''}
+        ${!nw&&!du&&!lr?`<span class="pill" style="background:var(--s3);color:var(--t3)">empty</span>`:''}
+      </div>
+    </div>`;
+  }).join('') +
+  `<div class="dtile add" onclick="openNewDeckModal()"><div style="font-size:26px;opacity:.35">+</div><div style="font-size:13px;font-weight:600">New Deck</div></div>
+  </div>`;
+  document.getElementById('content').innerHTML = html;
+  renderSB();
+}
+
+function openDeck(id) {
+  S.cur = S.decks.find(d => d.id===id);
+  if (!S.cur) return;
+  setNav(null);
+  document.getElementById('ttitle').textContent = `${S.cur.emoji} ${S.cur.name}`;
+  document.getElementById('tactions').innerHTML = `
+    <div class="srch"><span class="srch-ic">🔍</span><input placeholder="Search..." oninput="renderCards(this.value)" id="srch-in"></div>
+    <div class="vtog">
+      <button class="vb ${S.view==='grid'?'active':''}" onclick="setView('grid')">⊞</button>
+      <button class="vb ${S.view==='list'?'active':''}" onclick="setView('list')">☰</button>
+    </div>
+    <button class="tb-btn" onclick="studyDeck('${id}')">⚡ Cram</button>
+    <button class="tb-btn ac" onclick="openNewCardModal('${id}')">+ Card</button>
+  `;
+  renderSB(); renderCards();
+}
+
+function setView(v) { S.view = v; if (S.cur) openDeck(S.cur.id); }
+
+function mkBadge(c) {
+  if (c.status==='new') return '<span class="badge new">New</span>';
+  if (c.status==='due') return '<span class="badge due">Due</span>';
+  return '<span class="badge learned">Done</span>';
+}
+
+function renderCards(q='') {
+  let cs = S.cards.filter(c => c.deckId===S.cur?.id);
+  if (q) { const ql = q.toLowerCase(); cs = cs.filter(c => c.front.toLowerCase().includes(ql)||c.back.toLowerCase().includes(ql)); }
+  const el = document.getElementById('content');
+  if (S.view === 'grid') {
+    el.innerHTML = `<div class="cg">` +
+      cs.map((c,i) => `<div class="ct" style="animation-delay:${i*0.03}s" onclick="editCard('${c.id}')">
+        <div class="ct-acts">
+          <button class="ct-act del" onclick="event.stopPropagation();deleteCard('${c.id}')" title="Delete">×</button>
+        </div>
+        ${c.frontImg ? `<img class="ct-img" src="${c.frontImg}" alt="">` : ''}
+        <div class="ct-front">${esc(c.front)}</div>
+        <div class="ct-back">${esc(c.back)}</div>
+        <div class="ct-foot">${mkBadge(c)}</div>
+      </div>`).join('') +
+      `<div class="ct add" onclick="openNewCardModal('${S.cur.id}')"><div style="font-size:20px">+</div><div>New Card</div></div>
+      </div>`;
+  } else {
+    el.innerHTML = `<div class="cl">` +
+      cs.map(c => `<div class="cl-row" onclick="editCard('${c.id}')">
+        ${c.frontImg ? `<img class="cl-thumb" src="${c.frontImg}" alt="">` : ''}
+        <span class="cl-front">${esc(c.front)}</span>
+        <span class="cl-back">${esc(c.back)}</span>
+        <div class="cl-row-acts">
+          ${mkBadge(c)}
+          <button class="ct-act del" onclick="event.stopPropagation();deleteCard('${c.id}')" title="Delete" style="margin-left:4px">×</button>
+        </div>
+      </div>`).join('') +
+      `<div class="cl-row" style="border-style:dashed;justify-content:center;color:var(--t3)" onclick="openNewCardModal('${S.cur.id}')">+ New Card</div>
+      </div>`;
+  }
+  if (!cs.length && !q) {
+    el.innerHTML += `<div class="empty"><div class="empty-icon">🗃️</div><div class="empty-title">No cards yet</div><div class="empty-sub">Click + Card to get started</div></div>`;
+  }
+}
+
+// ════════════════════════════════════════════════════
+// STUDY
+// ════════════════════════════════════════════════════
+function studyDeck(id) { startStudy(S.cards.filter(c => c.deckId===id && (c.status==='new'||c.status==='due'))); }
+function studyAll()    { startStudy(S.cards.filter(c => c.status==='new'||c.status==='due')); }
+
+function startStudy(q) {
+  if (!q.length) { notify('No cards due! 🎉', 'ok'); return; }
+  S.sq = shuffle([...q]); S.si = 0; S.sf = false;
+  S.ss = {again:0,hard:0,good:0,easy:0}; S.cur = null;
+  renderSB();
+  document.getElementById('ttitle').textContent = 'Study Session';
+  document.getElementById('tactions').innerHTML = `<button class="tb-btn warn" onclick="showHome()">✕ End Session</button>`;
+  renderStudy();
+}
+
+function getDeckName(id) { return S.decks.find(d=>d.id===id)?.name || ''; }
+
+function renderStudy() {
+  if (S.si >= S.sq.length) { renderDone(); return; }
+  const c = S.sq[S.si], tot = S.sq.length, pct = Math.round((S.si/tot)*100);
+  const fi = c.frontImg ? `<img class="study-img" src="${c.frontImg}" alt="">` : '';
+  const bi = c.backImg  ? `<img class="study-img" src="${c.backImg}"  alt="" style="margin-top:12px">` : '';
+  document.getElementById('content').innerHTML = `
+    <div class="study-wrap fade-in">
+      <div class="s-prog">
+        <span>${S.si+1}/${tot}</span>
+        <div class="s-bar"><div class="s-fill" style="width:${pct}%"></div></div>
+        <span>${pct}%</span>
+      </div>
+      <div class="flashcard ${S.sf?'flipped':''}" onclick="flipStudy()">
+        <div class="fc-label">${S.sf?'Back':'Front'}</div>
+        <div class="fc-deck">${getDeckName(c.deckId)}</div>
+        ${S.sf ? fi : fi}
+        <div class="fc-q">${esc(c.front)}</div>
+        ${S.sf ? `<div class="fc-a">${esc(c.back)}${bi}</div>` : ''}
+      </div>
+      ${S.sf ? `<div class="rate-row">
+        <button class="rb again" onclick="rate('again')">Again<span class="rb-sub">&lt;1 min</span></button>
+        <button class="rb hard"  onclick="rate('hard')">Hard<span class="rb-sub">1 day</span></button>
+        <button class="rb good"  onclick="rate('good')">Good<span class="rb-sub">3 days</span></button>
+        <button class="rb easy"  onclick="rate('easy')">Easy<span class="rb-sub">1 week</span></button>
+      </div>` : `<div class="fc-hint">Tap card or Space to reveal answer</div>`}
+    </div>`;
+}
+
+function flipStudy() { S.sf = !S.sf; renderStudy(); }
+
+function rate(r) {
+  const c = S.sq[S.si]; S.ss[r]++;
+  const iv = {again:0, hard:1, good:3, easy:7};
+  const ni = iv[r];
+  const idx = S.cards.findIndex(x => x.id===c.id);
+  if (idx !== -1) {
+    S.cards[idx].interval = ni;
+    S.cards[idx].status = ni===0 ? 'due' : 'learned';
+    S.cards[idx].due = Date.now() + ni*86400000;
+  }
+  S.history.push({ date:Date.now(), cardId:c.id, deckId:c.deckId, rating:r });
+  if (r==='again') S.sq.push(c);
+  S.si++; S.sf = false; persist(); renderStudy();
+}
+
+function renderDone() {
+  const s = S.ss, tot = s.again+s.hard+s.good+s.easy;
+  document.getElementById('content').innerHTML = `
+    <div class="done-wrap fade-in">
+      <div class="done-emoji">🎉</div>
+      <div class="done-title">Session Complete!</div>
+      <div class="done-sub">You reviewed ${tot} card${tot!==1?'s':''}. Consistency is how NEET PG gets cracked.</div>
+      <div class="done-stats">
+        <div class="ds"><div class="ds-n" style="color:var(--red)">${s.again}</div><div class="ds-l">Again</div></div>
+        <div class="ds"><div class="ds-n" style="color:var(--yellow)">${s.hard}</div><div class="ds-l">Hard</div></div>
+        <div class="ds"><div class="ds-n" style="color:var(--green)">${s.good}</div><div class="ds-l">Good</div></div>
+        <div class="ds"><div class="ds-n" style="color:var(--a2)">${s.easy}</div><div class="ds-l">Easy</div></div>
+      </div>
+      <button class="btn btn-p" style="margin-top:8px" onclick="showHome()">Back to Decks</button>
+    </div>`;
+}
+
+// ════════════════════════════════════════════════════
+// ANALYTICS
+// ════════════════════════════════════════════════════
+function dstr(ts) { const d=new Date(ts); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; }
+
+function calcStreak() {
+  if (!S.history.length) return 0;
+  const days = new Set(S.history.map(h => dstr(h.date)));
+  let streak = 0, now = Date.now();
+  for (let i=0; i<365; i++) { if (days.has(dstr(now-i*86400000))) streak++; else if(i>0) break; }
+  return streak;
+}
+
+function showAnalytics() {
+  S.cur = null; setNav('nb-analytics');
+  document.getElementById('ttitle').textContent = 'Analytics';
+  document.getElementById('tactions').innerHTML = '';
+  renderSB();
+  const now = Date.now(), today = dstr(now);
+  const totalRev = S.history.length;
+  const todayRev = S.history.filter(h => dstr(h.date)===today).length;
+  const learned  = S.cards.filter(c => c.status==='learned').length;
+  const streak   = calcStreak();
+  const good     = S.history.filter(h => h.rating==='good'||h.rating==='easy').length;
+  const ret      = totalRev ? Math.round((good/totalRev)*100) : 0;
+  const days14   = []; for(let i=13;i>=0;i--){const d=new Date(now-i*86400000);days14.push({label:d.toLocaleDateString('en',{weekday:'narrow',day:'numeric'}),date:dstr(now-i*86400000),count:0});}
+  S.history.forEach(h=>{const f=days14.find(x=>x.date===dstr(h.date));if(f)f.count++;});
+  const mx14 = Math.max(...days14.map(d=>d.count),1);
+  const rc = {again:0,hard:0,good:0,easy:0}; S.history.forEach(h=>{if(rc[h.rating]!==undefined)rc[h.rating]++;});
+  const heat = []; for(let i=181;i>=0;i--){const d=dstr(now-i*86400000);heat.push({date:d,cnt:S.history.filter(h=>dstr(h.date)===d).length});}
+  const mxh = Math.max(...heat.map(h=>h.cnt),1);
+  const db = S.decks.map(d=>{const cs=S.cards.filter(c=>c.deckId===d.id);const lr=cs.filter(c=>c.status==='learned').length;return{...d,total:cs.length,learned:lr,pct:cs.length?Math.round((lr/cs.length)*100):0};});
+
+  document.getElementById('content').innerHTML = `<div class="fade-in">
+    <div class="ag">
+      <div class="acard" data-icon="🔥"><div class="a-label">Streak</div><div style="display:flex;align-items:baseline;gap:6px"><div class="streak-num">${streak}</div><div style="font-size:12px;color:var(--t2);margin-left:4px">days</div></div></div>
+      <div class="acard" data-icon="⚡"><div class="a-label">Reviewed Today</div><div class="a-num" style="color:var(--a2)">${todayRev}</div><div class="a-sub">${totalRev} all time</div></div>
+      <div class="acard" data-icon="✅"><div class="a-label">Mastered</div><div class="a-num" style="color:var(--green)">${learned}</div><div class="a-sub">of ${S.cards.length} cards</div></div>
+      <div class="acard" data-icon="🎯"><div class="a-label">Retention</div><div class="a-num" style="color:var(--yellow)">${ret}%</div><div class="a-sub">good + easy rate</div></div>
+    </div>
+    <div class="chart-box">
+      <div class="chart-title">Daily Reviews — Last 14 Days</div>
+      <div class="bar-chart">${days14.map(d=>{const h=Math.max(3,Math.round((d.count/mx14)*82));return`<div class="bcol"><div class="bval">${d.count||''}</div><div class="bar" style="height:${h}px;background:${d.date===today?'var(--accent)':'var(--s4)'}"></div><div class="blab">${d.label}</div></div>`;}).join('')}</div>
+    </div>
+    <div class="chart-box">
+      <div class="chart-title">Rating Breakdown</div>
+      <div class="bar-chart" style="height:80px">${[['again',rc.again,'var(--red)'],['hard',rc.hard,'var(--yellow)'],['good',rc.good,'var(--green)'],['easy',rc.easy,'var(--a2)']].map(([l,n,col])=>{const tot=Math.max(Object.values(rc).reduce((a,b)=>a+b,0),1);const h=Math.max(3,Math.round((n/tot)*70));return`<div class="bcol"><div class="bval" style="color:${col}">${n}</div><div class="bar" style="height:${h}px;background:${col};opacity:.8"></div><div class="blab">${l}</div></div>`;}).join('')}</div>
+    </div>
+    <div class="chart-box">
+      <div class="chart-title">Activity — Last 6 Months</div>
+      <div class="hmap">${heat.map(h=>{const a=h.cnt?Math.max(.12,Math.min(1,h.cnt/mxh)):0;const bg=h.cnt?`rgba(124,106,247,${a})`:'var(--s3)';return`<div class="hcell" style="background:${bg}" title="${h.date}: ${h.cnt}"></div>`;}).join('')}</div>
+      <div style="display:flex;gap:12px;margin-top:10px;flex-wrap:wrap">${[['var(--s3)','0'],['rgba(124,106,247,.2)','low'],['rgba(124,106,247,.6)','mid'],['var(--accent)','high']].map(([c,l])=>`<div style="display:flex;align-items:center;gap:5px;font-size:10px;color:var(--t2);font-family:'DM Mono',monospace"><div style="width:8px;height:8px;border-radius:2px;background:${c}"></div>${l}</div>`).join('')}</div>
+    </div>
+    <div class="chart-box">
+      <div class="chart-title">Deck Progress</div>
+      ${db.map(d=>`<div class="dp-row"><div style="font-size:16px;flex-shrink:0">${d.emoji}</div><div class="dp-name">${d.name}</div><div class="dp-bar"><div class="dp-fill" style="width:${d.pct}%;background:${d.color}"></div></div><div class="dp-pct">${d.pct}%</div><div class="dp-cnt">${d.learned}/${d.total}</div></div>`).join('')}
+    </div>
+  </div>`;
+}
+
+// ════════════════════════════════════════════════════
+// SYNC  —  fixed: proper CORS headers, content chunking, error surfacing
+// ════════════════════════════════════════════════════
+function showSync() {
+  S.cur = null; setNav('nb-sync');
+  document.getElementById('ttitle').textContent = 'Sync & Export';
+  document.getElementById('tactions').innerHTML = '';
+  renderSB();
+  const con = !!(S.gh.token && S.gh.gist);
+  const hasToken = !!S.gh.token;
+  document.getElementById('content').innerHTML = `<div class="fade-in" style="max-width:640px">
+    <div class="sync-grid">
+      <div class="sync-card">
+        <div class="sync-card-title">☁️ GitHub Gist Sync</div>
+        <div class="sync-card-sub">Store your cards in a private GitHub Gist — free, permanent, and accessible from any device.</div>
+        <div class="conn-status ${con?'on':'off'}">
+          <div class="sync-dot ${con?'on':'off'}"></div>
+          ${con ? 'Connected & ready' : hasToken ? 'Token set — push to create Gist' : 'Not connected'}
+        </div>
+        <div class="gist-id-display ${con?'show':''}" id="gist-id-box">Gist: ${S.gh.gist||''}</div>
+        <div class="sync-btn-row">
+          <button class="btn btn-p" onclick="openModal('mo-sync')">${hasToken?'⚙ Config':'🔗 Connect'}</button>
+          ${hasToken ? `<button class="btn btn-g" onclick="syncPush()" id="push-btn">↑ Push</button>` : ''}
+          ${con      ? `<button class="btn btn-g" onclick="syncPull()" id="pull-btn">↓ Pull</button>` : ''}
+        </div>
+        ${S.gh.lastSync ? `<div style="font-size:11px;color:var(--t3);font-family:'DM Mono',monospace;margin-top:10px">Last sync: ${new Date(S.gh.lastSync).toLocaleString()}</div>` : ''}
+      </div>
+      <div class="sync-card">
+        <div class="sync-card-title">📤 Export</div>
+        <div class="sync-card-sub">Download your cards for backup or import into Anki.</div>
+        <div class="sync-btn-row" style="flex-direction:column;gap:8px">
+          <button class="btn btn-g" style="width:100%" onclick="exportJSON()">⬇ JSON Backup (full)</button>
+          <button class="btn btn-g" style="width:100%" onclick="exportCSV()">⬇ CSV for Anki</button>
+        </div>
+      </div>
+    </div>
+    <div class="sync-card" style="margin-bottom:12px">
+      <div class="sync-card-title">📥 Import</div>
+      <div class="sync-card-sub">Restore from a JSON backup or import an Anki-style CSV file.</div>
+      <div class="sync-btn-row">
+        <label class="btn btn-g" style="cursor:pointer">⬆ Import JSON<input type="file" accept=".json" style="display:none" onchange="importJSON(this)"></label>
+        <label class="btn btn-g" style="cursor:pointer">⬆ Import CSV<input type="file" accept=".csv,.txt" style="display:none" onchange="importCSV(this)"></label>
+      </div>
+    </div>
+    <div class="info-box" style="font-size:11.5px">
+      <strong style="color:var(--t)">💡 How Gist sync works:</strong><br>
+      Push uploads your data to a private Gist. Pull downloads it. Use Push on your primary device after studying, then Pull on your other device to get the latest cards and SRS progress.<br><br>
+      <strong style="color:var(--t)">⚠ Images & Gist size:</strong> Images are stored as base64 inside cards. Large images can make your Gist exceed GitHub's limit (~10MB). If Push fails, use JSON Export/Import instead — it handles images correctly.
+    </div>
+  </div>`;
+}
+
+// ── CORE SYNC FUNCTIONS (FIXED) ──────────────────────────────
+// Root cause of sync failure: images make JSON too large for Gist (~1MB file limit per file).
+// Fix: strip images before Gist sync, keep a separate localStorage copy with images.
+// Also: proper Authorization header format and error surfacing.
+
+function buildSyncPayload() {
+  // Strip base64 images to keep Gist small — images stay in localStorage
+  return {
+    decks: S.decks,
+    cards: S.cards.map(c => ({ ...c, frontImg: c.frontImg ? '__img__' : null, backImg: c.backImg ? '__img__' : null })),
+    history: S.history,
+    exportedAt: new Date().toISOString(),
+    version: 4
+  };
+}
+
+async function syncPush() {
+  if (!S.gh.token) { notify('Connect GitHub first', 'err'); return; }
+  const btn = document.getElementById('push-btn');
+  if (btn) { btn.textContent = 'Pushing…'; btn.disabled = true; }
+  notify('Pushing to Gist…', 'inf');
+  try {
+    const payload = JSON.stringify(buildSyncPayload(), null, 2);
+    if (payload.length > 9_000_000) { notify('Data too large (>9MB). Remove some images first.', 'err'); return; }
+    const body = { description: 'Flashy — flashcard data (do not edit)', public: false, files: { 'flashy_data.json': { content: payload } } };
+    const headers = { 'Authorization': `Bearer ${S.gh.token}`, 'Accept': 'application/vnd.github+json', 'X-GitHub-Api-Version': '2022-11-28', 'Content-Type': 'application/json' };
+    let url = 'https://api.github.com/gists';
+    let method = 'POST';
+    if (S.gh.gist) { url = `https://api.github.com/gists/${S.gh.gist}`; method = 'PATCH'; }
+    const resp = await fetch(url, { method, headers, body: JSON.stringify(body) });
+    if (!resp.ok) {
+      const err = await resp.json().catch(()=>({message:resp.statusText}));
+      throw new Error(`GitHub ${resp.status}: ${err.message}`);
+    }
+    const data = await resp.json();
+    S.gh.gist = data.id;
+    S.gh.lastSync = Date.now();
+    persist();
+    updateSyncStatus();
+    notify(`Pushed ✓  Gist: ${data.id.slice(0,8)}…`, 'ok');
+    showSync();
+  } catch(e) {
+    notify('Push failed: ' + e.message, 'err');
+  } finally {
+    if (btn) { btn.textContent = '↑ Push'; btn.disabled = false; }
+  }
+}
+
+async function syncPull() {
+  if (!S.gh.token) { notify('Connect GitHub first', 'err'); return; }
+  if (!S.gh.gist)  { notify('No Gist ID — push first or enter ID in config', 'err'); return; }
+  const btn = document.getElementById('pull-btn');
+  if (btn) { btn.textContent = 'Pulling…'; btn.disabled = true; }
+  notify('Pulling from Gist…', 'inf');
+  try {
+    const headers = { 'Authorization': `Bearer ${S.gh.token}`, 'Accept': 'application/vnd.github+json', 'X-GitHub-Api-Version': '2022-11-28' };
+    const resp = await fetch(`https://api.github.com/gists/${S.gh.gist}`, { headers });
+    if (!resp.ok) {
+      const err = await resp.json().catch(()=>({message:resp.statusText}));
+      throw new Error(`GitHub ${resp.status}: ${err.message}`);
+    }
+    const data = await resp.json();
+    const raw = data.files?.['flashy_data.json']?.content;
+    if (!raw) throw new Error('flashy_data.json not found in Gist');
+    const p = JSON.parse(raw);
+    // Restore: merge pulled cards with local images (images are kept locally)
+    const localCards = S.cards;
+    S.decks   = p.decks   || [];
+    S.history = p.history || [];
+    S.cards   = (p.cards || []).map(pc => {
+      const local = localCards.find(lc => lc.id === pc.id);
+      return {
+        ...pc,
+        frontImg: pc.frontImg === '__img__' ? (local?.frontImg || null) : pc.frontImg,
+        backImg:  pc.backImg  === '__img__' ? (local?.backImg  || null) : pc.backImg,
+      };
+    });
+    S.gh.lastSync = Date.now();
+    persist();
+    updateSyncStatus();
+    notify(`Pulled ✓  ${S.cards.length} cards, ${S.decks.length} decks`, 'ok');
+    showHome();
+  } catch(e) {
+    notify('Pull failed: ' + e.message, 'err');
+  } finally {
+    if (btn) { btn.textContent = '↓ Pull'; btn.disabled = false; }
+  }
+}
+
+function saveGHConfig() {
+  const tok = document.getElementById('gh-tok').value.trim();
+  const gid = document.getElementById('gh-gid').value.trim();
+  if (!tok) { notify('Enter your GitHub token', 'err'); return; }
+  S.gh.token = tok;
+  S.gh.gist  = gid;
+  persist();
+  closeModal('mo-sync');
+  notify('Config saved — pushing now…', 'inf');
+  setTimeout(syncPush, 300);
+}
+
+// ════════════════════════════════════════════════════
+// EXPORT / IMPORT
+// ════════════════════════════════════════════════════
+function exportJSON() {
+  const data = JSON.stringify({ decks:S.decks, cards:S.cards, history:S.history, exportedAt:new Date().toISOString() }, null, 2);
+  dl('flashy_backup.json', data, 'application/json');
+  notify('JSON exported ✓', 'ok');
+}
+function exportCSV() {
+  const rows = ['Front,Back,Deck,Status'];
+  S.cards.forEach(c => { const dn = S.decks.find(d=>d.id===c.deckId)?.name||''; rows.push(`"${escq(c.front)}","${escq(c.back)}","${dn}","${c.status}"`); });
+  dl('flashy_anki.csv', rows.join('\n'), 'text/csv');
+  notify('CSV exported ✓', 'ok');
+}
+function importJSON(inp) {
+  const f = inp.files[0]; if (!f) return;
+  const r = new FileReader();
+  r.onload = e => {
+    try {
+      const p = JSON.parse(e.target.result);
+      if (!p.decks||!p.cards) { notify('Invalid backup file', 'err'); return; }
+      S.decks=p.decks; S.cards=p.cards; S.history=p.history||[];
+      persist(); notify(`Imported: ${S.decks.length} decks, ${S.cards.length} cards ✓`, 'ok'); showHome();
+    } catch { notify('Could not parse file', 'err'); }
+  };
+  r.readAsText(f);
+}
+function importCSV(inp) {
+  const f = inp.files[0]; if (!f) return;
+  const r = new FileReader();
+  r.onload = e => {
+    const lines = e.target.result.split('\n').filter(l=>l.trim());
+    const start = lines[0].toLowerCase().includes('front') ? 1 : 0;
+    let deck = S.decks[0];
+    if (!deck) { deck={id:uid(),name:'Imported',emoji:'📥',color:'#7c6af7'}; S.decks.push(deck); }
+    let cnt = 0;
+    lines.slice(start).forEach(line => {
+      const p = parseCSV(line);
+      if (p.length>=2&&p[0]&&p[1]) { S.cards.push(mkCard(deck.id,p[0],p[1])); cnt++; }
+    });
+    persist(); notify(`Imported ${cnt} cards ✓`, 'ok'); showHome();
+  };
+  r.readAsText(f);
+}
+function parseCSV(l){const r=[];let cur='',q=false;for(const ch of l){if(ch==='"')q=!q;else if(ch===','&&!q){r.push(cur.trim());cur='';}else cur+=ch;}r.push(cur.trim());return r;}
+
+// ════════════════════════════════════════════════════
+// DECK MODALS
+// ════════════════════════════════════════════════════
+function openNewDeckModal() {
+  S.editDeck = null;
+  document.getElementById('deck-modal-title').textContent = 'New Deck';
+  document.getElementById('d-name').value = '';
+  document.getElementById('d-emoji').value = '';
+  renderCPicker(COLORS[0]);
+  openModal('mo-deck');
+}
+function editDeckModal(id) {
+  S.editDeck = id;
+  const d = S.decks.find(x=>x.id===id); if(!d) return;
+  document.getElementById('deck-modal-title').textContent = 'Edit Deck';
+  document.getElementById('d-name').value = d.name;
+  document.getElementById('d-emoji').value = d.emoji;
+  renderCPicker(d.color);
+  openModal('mo-deck');
+}
+function renderCPicker(sel) {
+  document.getElementById('cpicker').innerHTML = COLORS.map(c => `<div class="cdot ${c===sel?'on':''}" style="background:${c}" onclick="selColor('${c}')"></div>`).join('');
+}
+function selColor(c) { renderCPicker(c); }
+function saveDeck() {
+  const name = document.getElementById('d-name').value.trim();
+  if (!name) { notify('Enter a deck name', 'err'); return; }
+  const emoji = document.getElementById('d-emoji').value.trim() || '📦';
+  const color = document.querySelector('.cdot.on')?.style.background || COLORS[0];
+  if (S.editDeck) {
+    const i = S.decks.findIndex(d=>d.id===S.editDeck);
+    if (i!==-1) { S.decks[i].name=name; S.decks[i].emoji=emoji; S.decks[i].color=color; }
+  } else {
+    S.decks.push({ id:uid(), name, emoji, color });
+  }
+  persist(); closeModal('mo-deck'); showHome();
+}
+function deleteDeck(id) {
+  if (!confirm('Delete this deck and ALL its cards?')) return;
+  S.decks = S.decks.filter(d=>d.id!==id);
+  S.cards = S.cards.filter(c=>c.deckId!==id);
+  persist(); showHome();
+}
+
+// ════════════════════════════════════════════════════
+// CARD MODALS  — edit is triggered by clicking anywhere on card
+// ════════════════════════════════════════════════════
+function openNewCardModal(did) {
+  S.editCard = null; S._fi = null; S._bi = null;
+  document.getElementById('card-modal-title').textContent = 'New Card';
+  document.getElementById('card-delete-btn').style.display = 'none';
+  document.getElementById('c-front').value = '';
+  document.getElementById('c-back').value = '';
+  resetImg('f'); resetImg('b');
+  popDeckSel(did || S.cur?.id);
+  openModal('mo-card');
+}
+function editCard(id) {
+  const c = S.cards.find(x=>x.id===id); if (!c) return;
+  S.editCard = id; S._fi = c.frontImg||null; S._bi = c.backImg||null;
+  document.getElementById('card-modal-title').textContent = 'Edit Card';
+  document.getElementById('card-delete-btn').style.display = 'block';
+  document.getElementById('c-front').value = c.front;
+  document.getElementById('c-back').value = c.back;
+  popDeckSel(c.deckId);
+  if (c.frontImg) showImg('f',c.frontImg); else resetImg('f');
+  if (c.backImg)  showImg('b',c.backImg);  else resetImg('b');
+  openModal('mo-card');
+}
+function deleteCurrentCard() {
+  if (!S.editCard) return;
+  if (!confirm('Delete this card?')) return;
+  S.cards = S.cards.filter(c=>c.id!==S.editCard);
+  persist(); closeModal('mo-card');
+  if (S.cur) renderCards(); else showHome();
+  notify('Card deleted', 'ok');
+}
+function deleteCard(id) {
+  if (!confirm('Delete this card?')) return;
+  S.cards = S.cards.filter(c=>c.id!==id);
+  persist(); renderCards();
+}
+function handleImg(side, inp) {
+  const f = inp.files[0]; if(!f) return;
+  // Resize large images before storing to save space
+  const reader = new FileReader();
+  reader.onload = e => {
+    const img = new Image();
+    img.onload = () => {
+      const MAX = 800;
+      let w = img.width, h = img.height;
+      if (w>MAX||h>MAX) { const r=Math.min(MAX/w,MAX/h); w=Math.round(w*r); h=Math.round(h*r); }
+      const canvas = document.createElement('canvas');
+      canvas.width=w; canvas.height=h;
+      canvas.getContext('2d').drawImage(img,0,0,w,h);
+      const data = canvas.toDataURL('image/jpeg',0.8);
+      if (side==='f') S._fi=data; else S._bi=data;
+      showImg(side==='f'?'f':'b', data);
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(f);
+}
+function showImg(s, src) { document.getElementById(`${s}i-wrap`).innerHTML = `<img class="img-preview" src="${src}" alt=""><button class="img-rm" onclick="clearImg('${s}')">× Remove</button>`; }
+function resetImg(s) { document.getElementById(`${s}i-wrap`).innerHTML = `<div style="font-size:20px;margin-bottom:4px">🖼️</div><div style="font-size:11px;color:var(--t3)">Tap to attach image</div>`; document.getElementById(`${s}i-inp`).value=''; }
+function clearImg(s) { if(s==='f')S._fi=null;else S._bi=null; resetImg(s); }
+function popDeckSel(sid) { document.getElementById('c-deck').innerHTML = S.decks.map(d=>`<option value="${d.id}" ${d.id===sid?'selected':''}>${d.emoji} ${d.name}</option>`).join(''); }
+function saveCard() {
+  const front = document.getElementById('c-front').value.trim();
+  const back  = document.getElementById('c-back').value.trim();
+  const did   = document.getElementById('c-deck').value;
+  if (!front||!back) { notify('Fill both front and back', 'err'); return; }
+  if (S.editCard) {
+    const i = S.cards.findIndex(c=>c.id===S.editCard);
+    if (i!==-1) { S.cards[i].front=front; S.cards[i].back=back; S.cards[i].deckId=did; S.cards[i].frontImg=S._fi; S.cards[i].backImg=S._bi; }
+  } else {
+    S.cards.push({ id:uid(), deckId:did, front, back, status:'new', interval:0, due:Date.now(), frontImg:S._fi, backImg:S._bi });
+  }
+  persist(); closeModal('mo-card');
+  if (S.cur) renderCards(); else showHome();
+  notify(S.editCard ? 'Card updated ✓' : 'Card added ✓', 'ok');
+}
+
+// ════════════════════════════════════════════════════
+// WIDGET  — Quick Add Card
+// ════════════════════════════════════════════════════
+function toggleWidget() {
+  const w = document.getElementById('widget'), fab = document.getElementById('widget-fab');
+  if (w.classList.contains('open')) { closeWidget(); }
+  else { w.classList.add('open'); fab.classList.add('hidden'); wPopDecks(); wClear(); }
+}
+function closeWidget() {
+  document.getElementById('widget').classList.remove('open');
+  document.getElementById('widget-fab').classList.remove('hidden');
+}
+function wPopDecks() {
+  const sel = document.getElementById('w-deck'), prev = sel.value;
+  sel.innerHTML = S.decks.map(d=>`<option value="${d.id}">${d.emoji} ${d.name}</option>`).join('');
+  if (prev && S.decks.find(d=>d.id===prev)) sel.value=prev;
+  else if (S.cur) sel.value=S.cur.id;
+}
+function wClear() {
+  document.getElementById('w-front').value='';
+  document.getElementById('w-back').value='';
+  document.getElementById('w-fb').style.display='none';
+  setTimeout(()=>document.getElementById('w-front').focus(), 50);
+}
+function wUpdateCounter() {
+  const did = document.getElementById('w-deck').value;
+  const n = S.cards.filter(c=>c.deckId===did).length;
+  document.getElementById('w-counter').textContent = `${n} card${n!==1?'s':''} in this deck`;
+}
+function wAdd() {
+  const front  = document.getElementById('w-front').value.trim();
+  const back   = document.getElementById('w-back').value.trim();
+  const deckId = document.getElementById('w-deck').value;
+  const fb = document.getElementById('w-fb');
+  if (!front||!back) {
+    fb.style.cssText='display:block;color:var(--red)'; fb.textContent='⚠ Fill both fields';
+    setTimeout(()=>fb.style.display='none',2000); return;
+  }
+  S.cards.push(mkCard(deckId, front, back));
+  persist();
+  fb.style.cssText='display:block;color:var(--green)'; fb.textContent='✓ Card added!';
+  document.getElementById('w-front').value='';
+  document.getElementById('w-back').value='';
+  document.getElementById('w-front').focus();
+  setTimeout(()=>fb.style.display='none',2000);
+  wUpdateCounter();
+  if (S.cur && S.cur.id===deckId) renderCards();
+  else renderSB();
+}
+
+// Drag widget
+(function(){
+  const w=document.getElementById('widget'),h=document.getElementById('w-hdr');
+  let dr=false,ox=0,oy=0;
+  h.addEventListener('mousedown',e=>{dr=true;w.style.right='auto';w.style.bottom='auto';ox=e.clientX-w.offsetLeft;oy=e.clientY-w.offsetTop;});
+  document.addEventListener('mousemove',e=>{if(!dr)return;w.style.left=(e.clientX-ox)+'px';w.style.top=(e.clientY-oy)+'px';});
+  document.addEventListener('mouseup',()=>dr=false);
+  h.addEventListener('touchstart',e=>{dr=true;w.style.right='auto';w.style.bottom='auto';const t=e.touches[0];ox=t.clientX-w.offsetLeft;oy=t.clientY-w.offsetTop;},{passive:true});
+  document.addEventListener('touchmove',e=>{if(!dr)return;const t=e.touches[0];w.style.left=(t.clientX-ox)+'px';w.style.top=(t.clientY-oy)+'px';},{passive:true});
+  document.addEventListener('touchend',()=>dr=false);
+})();
+
+// ════════════════════════════════════════════════════
+// MODAL UTILS
+// ════════════════════════════════════════════════════
+function openModal(id) {
+  document.getElementById(id).classList.add('open');
+  if (id==='mo-sync') {
+    if (S.gh.token) document.getElementById('gh-tok').value=S.gh.token;
+    if (S.gh.gist)  document.getElementById('gh-gid').value=S.gh.gist;
+  }
+}
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+document.querySelectorAll('.mo').forEach(o=>o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('open');}));
+
+// ════════════════════════════════════════════════════
+// KEYBOARD
+// ════════════════════════════════════════════════════
+document.addEventListener('keydown',e=>{
+  const tag = document.activeElement.tagName;
+  if (e.key==='Escape') document.querySelectorAll('.mo').forEach(m=>m.classList.remove('open'));
+  if (e.key===' '&&!['INPUT','TEXTAREA','SELECT'].includes(tag)) { e.preventDefault(); if(S.sq.length&&S.si<S.sq.length)flipStudy(); }
+  if (e.key==='n'&&!['INPUT','TEXTAREA','SELECT'].includes(tag)) openNewCardModal();
+});
+
+// ════════════════════════════════════════════════════
+// UTILS
+// ════════════════════════════════════════════════════
+function esc(s){return(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>')}
+function escq(s){return(s||'').replace(/"/g,'""')}
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+function dl(n,d,t){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([d],{type:t}));a.download=n;a.click();}
+let ntTimer;
+function notify(msg,type='inf'){
+  const el=document.getElementById('notif');
+  el.textContent=msg;el.className=`notif show ${type}`;
+  clearTimeout(ntTimer);ntTimer=setTimeout(()=>el.classList.remove('show'),3200);
+}
+
+// ════════════════════════════════════════════════════
+// INIT
+// ════════════════════════════════════════════════════
+loadState();
+showHome();
+</script>
+</body>
+</html>
